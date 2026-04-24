@@ -155,27 +155,26 @@ const paginatedList = computed(() => {
 
 function fetchList() {
   loading.value = true
-  // 后端未实现时先用 mock 数据
-  setTimeout(() => {
-    courseList.value = mockData
-    total.value = mockData.length
-    loading.value = false
-  }, 300)
-
-  // 后端实现后切换为真实请求
-  // request.get('/courses', {
-  //   params: {
-  //     semester: filterSemester.value || undefined,
-  //     courseType: filterType.value || undefined,
-  //     page: currentPage.value,
-  //     pageSize: pageSize.value,
-  //   },
-  // }).then((res) => {
-  //   courseList.value = res.rows
-  //   total.value = res.total
-  // }).finally(() => {
-  //   loading.value = false
-  // })
+  request
+    .get('/courses', {
+      params: {
+        semester: filterSemester.value || undefined,
+        courseType: filterType.value || undefined,
+        page: currentPage.value,
+        pageSize: pageSize.value,
+      },
+    })
+    .then((res) => {
+      courseList.value = res.rows || []
+      total.value = res.total || 0
+    })
+    .catch(() => {
+      courseList.value = []
+      total.value = 0
+    })
+    .finally(() => {
+      loading.value = false
+    })
 }
 
 function handleFilter() {
@@ -227,39 +226,19 @@ function handleSubmit() {
 }
 
 function handleAdd() {
-  // 模拟添加成功
-  const newCourse = {
-    id: Date.now(),
-    ...form,
-  }
-  courseList.value.unshift(newCourse)
-  total.value++
-  ElMessage.success('添加成功')
-  dialogVisible.value = false
-
-  // 后端实现后切换为真实请求
-  // request.post('/courses', form).then(() => {
-  //   ElMessage.success('添加成功')
-  //   dialogVisible.value = false
-  //   fetchList()
-  // })
+  request.post('/courses', form).then(() => {
+    ElMessage.success('添加成功')
+    dialogVisible.value = false
+    fetchList()
+  })
 }
 
 function handleUpdate() {
-  // 模拟更新成功
-  const index = courseList.value.findIndex((item) => item.id === form.id)
-  if (index > -1) {
-    courseList.value[index] = { ...form }
-  }
-  ElMessage.success('修改成功')
-  dialogVisible.value = false
-
-  // 后端实现后切换为真实请求
-  // request.put('/courses', form).then(() => {
-  //   ElMessage.success('修改成功')
-  //   dialogVisible.value = false
-  //   fetchList()
-  // })
+  request.put('/courses', form).then(() => {
+    ElMessage.success('修改成功')
+    dialogVisible.value = false
+    fetchList()
+  })
 }
 
 function handleDelete(row) {
@@ -268,16 +247,10 @@ function handleDelete(row) {
     cancelButtonText: '取消',
     type: 'warning',
   }).then(() => {
-    // 模拟删除成功
-    courseList.value = courseList.value.filter((item) => item.id !== row.id)
-    total.value--
-    ElMessage.success('删除成功')
-
-    // 后端实现后切换为真实请求
-    // request.delete(`/courses/${row.id}`).then(() => {
-    //   ElMessage.success('删除成功')
-    //   fetchList()
-    // })
+    request.delete(`/courses/${row.id}`).then(() => {
+      ElMessage.success('删除成功')
+      fetchList()
+    })
   })
 }
 

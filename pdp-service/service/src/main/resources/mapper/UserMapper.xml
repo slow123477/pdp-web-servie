@@ -38,4 +38,21 @@
         WHERE id = #{id}
     </select>
 
+    <!-- 动态更新用户字段 -->
+    <update id="update">
+        UPDATE users
+        <set>
+            <if test="username != null">username = #{username},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="studentId != null">student_id = #{studentId},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="realName != null">real_name = #{realName},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="major != null">major = #{major},</if>
+            <if test="gradeYear != null">grade_year = #{gradeYear},</if>
+            updated_at = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
 </mapper>

@@ -30,4 +30,9 @@ public interface UserMapper {
      * 根据ID查询用户
      */
     User findById(Long id);
+
+    /**
+     * 动态更新用户字段（只更新非空字段）
+     */
+    void update(User user);
 }

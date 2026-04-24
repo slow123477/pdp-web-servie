@@ -63,6 +63,12 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Spring Security Crypto (仅BCrypt密码加密，不引入安全过滤器链) -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+
         <!-- JWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>

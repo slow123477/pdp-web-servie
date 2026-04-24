@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>系统设置 - 成长规划</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-display: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Georgia', serif;
+      --font-body: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+      --text-xs: 0.75rem; --text-sm: 0.875rem; --text-base: 1rem;
+      --text-lg: 1.25rem; --text-xl: 1.5rem; --text-2xl: 2rem;
+      --space-xs: 0.25rem; --space-sm: 0.5rem; --space-md: 0.75rem;
+      --space-lg: 1rem; --space-xl: 1.5rem; --space-2xl: 2rem; --space-3xl: 3rem;
+      --bg-base: oklch(98% 0.008 30);
+      --bg-surface: oklch(96% 0.012 30);
+      --bg-surface-hover: oklch(94% 0.015 30);
+      --border-subtle: oklch(88% 0.015 30);
+      --text-primary: oklch(25% 0.02 30);
+      --text-secondary: oklch(48% 0.025 30);
+      --text-tertiary: oklch(62% 0.02 30);
+      --color-primary: oklch(70% 0.14 20);
+      --color-primary-deep: oklch(58% 0.16 20);
+      --color-primary-light: oklch(85% 0.08 20);
+      --color-primary-bg: oklch(96% 0.02 20);
+      --color-ai: oklch(62% 0.15 300);
+      --color-ai-bg: oklch(96% 0.025 300);
+      --radius-sm: 6px; --radius-md: 10px; --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px oklch(70% 0.01 30 / 0.06);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-body); font-size: var(--text-base); line-height: 1.6; color: var(--text-primary); background: var(--bg-base); }
+    h1, h2, h3 { font-family: var(--font-display); font-weight: 400; line-height: 1.25; }
+
+    .top-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-md) var(--space-2xl); background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle); position: sticky; top: 0; z-index: 100;
+    }
+    .nav-brand { display: flex; align-items: center; gap: var(--space-sm); }
+    .nav-logo { font-size: var(--text-xl); }
+    .nav-title { font-family: var(--font-display); font-size: var(--text-lg); }
+    .nav-links { display: flex; gap: var(--space-xs); }
+    .nav-link { padding: var(--space-sm) var(--space-md); border-radius: var(--radius-sm); font-size: var(--text-sm); color: var(--text-secondary); transition: all 0.2s; }
+    .nav-link:hover { color: var(--text-primary); background: var(--bg-base); }
+    .nav-link.is-active { color: var(--color-primary-deep); background: var(--color-primary-bg); }
+    .nav-user { display: flex; align-items: center; gap: var(--space-md); }
+    .user-name { font-size: var(--text-sm); color: var(--text-secondary); }
+    .user-avatar {
+      width: 36px; height: 36px; border-radius: 50%; background: var(--color-primary-light);
+      color: var(--color-primary-deep); display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display); font-size: var(--text-sm); border: 2px solid var(--bg-base);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .user-avatar:hover { box-shadow: 0 0 0 3px oklch(85% 0.08 20 / 0.3); }
+
+    .page { max-width: 800px; margin: 0 auto; padding: var(--space-3xl) var(--space-2xl); }
+    .page-title { font-size: var(--text-2xl); margin-bottom: var(--space-xl); }
+
+    .settings-card {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg); padding: var(--space-xl);
+      margin-bottom: var(--space-xl);
+    }
+    .settings-card-title { font-size: var(--text-lg); margin-bottom: var(--space-lg); }
+    .setting-item { display: flex; align-items: center; justify-content: space-between; padding: var(--space-md) 0; border-bottom: 1px solid var(--border-subtle); }
+    .setting-item:last-child { border-bottom: none; }
+    .setting-label { font-size: var(--text-sm); font-weight: 500; }
+    .setting-desc { font-size: var(--text-xs); color: var(--text-tertiary); margin-top: 2px; }
+    .setting-control select, .setting-control input[type="text"] {
+      padding: var(--space-sm) var(--space-md); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md); font-family: inherit; font-size: var(--text-sm);
+      color: var(--text-primary); background: var(--bg-base); min-width: 160px;
+    }
+    .checkbox-group { display: flex; flex-direction: column; gap: var(--space-sm); }
+    .checkbox-group label { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--text-sm); color: var(--text-secondary); cursor: pointer; }
+    .checkbox-group input { accent-color: var(--color-primary); }
+
+    .btn-save {
+      padding: var(--space-sm) var(--space-xl); background: var(--color-primary); color: white;
+      border: none; border-radius: var(--radius-md); font-size: var(--text-sm); font-weight: 500;
+      font-family: inherit; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-save:hover { background: var(--color-primary-deep); }
+
+    .danger-zone { border-color: oklch(80% 0.1 25); }
+    .danger-zone .settings-card-title { color: oklch(55% 0.18 25); }
+    .btn-danger {
+      padding: var(--space-sm) var(--space-md); background: transparent; color: oklch(55% 0.18 25);
+      border: 1px solid oklch(80% 0.1 25); border-radius: var(--radius-md); font-size: var(--text-sm);
+      font-family: inherit; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-danger:hover { background: oklch(95% 0.03 25); }
+
+    @media (max-width: 768px) {
+      .page { padding: var(--space-xl) var(--space-lg); }
+      .setting-item { flex-direction: column; align-items: flex-start; gap: var(--space-sm); }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-nav">
+    <div class="nav-brand"><span class="nav-logo">🌱</span><span class="nav-title">成长规划</span></div>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">首页</a>
+      <a href="courses.html" class="nav-link">课程</a>
+      <a href="experiences.html" class="nav-link">经历</a>
+      <a href="achievements.html" class="nav-link">成就</a>
+      <a href="roles.html" class="nav-link">角色</a>
+      <a href="ai-analysis.html" class="nav-link">AI分析</a>
+    </div>
+    <div class="nav-user">
+      <span class="user-name">小明</span>
+      <a href="settings.html"><div class="user-avatar">明</div></a>
+    </div>
+  </nav>
+
+  <main class="page">
+    <h1 class="page-title">系统设置</h1>
+
+    <div class="settings-card">
+      <h2 class="settings-card-title">GPA 计算方式</h2>
+      <div class="setting-item">
+        <div>
+          <div class="setting-label">计算标准</div>
+          <div class="setting-desc">选择你学校使用的 GPA 算法</div>
+        </div>
+        <div class="setting-control">
+          <select>
+            <option>4.0 制（标准）</option>
+            <option>5.0 制</option>
+            <option>百分制加权</option>
+          </select>
+        </div>
+      </div>
+      <div class="setting-item">
+        <div>
+          <div class="setting-label">绩点对照表</div>
+          <div class="setting-desc">90-100 = 4.0, 85-89 = 3.7 ...</div>
+        </div>
+        <div class="setting-control">
+          <button class="btn-save" style="padding: var(--space-sm) var(--space-md); font-size: var(--text-xs);">编辑对照表</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <h2 class="settings-card-title">AI 分析配置</h2>
+      <div class="setting-item">
+        <div>
+          <div class="setting-label">分析维度</div>
+          <div class="setting-desc">选择 AI 分析时重点关注的方向</div>
+        </div>
+        <div class="setting-control checkbox-group">
+          <label><input type="checkbox" checked> 能力评估</label>
+          <label><input type="checkbox" checked> 发展方向</label>
+          <label><input type="checkbox"> 简历优化建议</label>
+          <label><input type="checkbox"> 竞争力分析</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <h2 class="settings-card-title">账号安全</h2>
+      <div class="setting-item">
+        <div>
+          <div class="setting-label">修改密码</div>
+          <div class="setting-desc">定期更换密码以保护账号安全</div>
+        </div>
+        <div class="setting-control"><button class="btn-save" style="padding: var(--space-sm) var(--space-md); font-size: var(--text-xs);">修改密码</button></div>
+      </div>
+      <div class="setting-item">
+        <div>
+          <div class="setting-label">绑定邮箱</div>
+          <div class="setting-desc">当前：xiaoming@example.edu.cn</div>
+        </div>
+        <div class="setting-control"><button class="btn-save" style="padding: var(--space-sm) var(--space-md); font-size: var(--text-xs);">更换邮箱</button></div>
+      </div>
+    </div>
+
+    <div class="settings-card danger-zone">
+      <h2 class="settings-card-title">危险区域</h2>
+      <div class="setting-item">
+        <div>
+          <div class="setting-label">清空所有数据</div>
+          <div class="setting-desc">此操作不可恢复，请谨慎</div>
+        </div>
+        <div class="setting-control"><button class="btn-danger">清空数据</button></div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: var(--space-2xl);">
+      <button class="btn-save">保存设置</button>
+    </div>
+  </main>
+</body>
+</html>

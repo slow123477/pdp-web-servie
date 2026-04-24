@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>角色管理 - 成长规划</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-display: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Georgia', serif;
+      --font-body: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+      --text-xs: 0.75rem; --text-sm: 0.875rem; --text-base: 1rem;
+      --text-lg: 1.25rem; --text-xl: 1.5rem; --text-2xl: 2rem;
+      --space-xs: 0.25rem; --space-sm: 0.5rem; --space-md: 0.75rem;
+      --space-lg: 1rem; --space-xl: 1.5rem; --space-2xl: 2rem; --space-3xl: 3rem;
+      --bg-base: oklch(98% 0.008 30);
+      --bg-surface: oklch(96% 0.012 30);
+      --bg-surface-hover: oklch(94% 0.015 30);
+      --border-subtle: oklch(88% 0.015 30);
+      --text-primary: oklch(25% 0.02 30);
+      --text-secondary: oklch(48% 0.025 30);
+      --text-tertiary: oklch(62% 0.02 30);
+      --color-primary: oklch(70% 0.14 20);
+      --color-primary-deep: oklch(58% 0.16 20);
+      --color-primary-light: oklch(85% 0.08 20);
+      --color-role: oklch(65% 0.13 280);
+      --color-role-bg: oklch(96% 0.02 280);
+      --radius-sm: 6px; --radius-md: 10px; --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px oklch(70% 0.01 30 / 0.06);
+      --shadow-md: 0 4px 12px oklch(70% 0.01 30 / 0.08);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-body); font-size: var(--text-base); line-height: 1.6; color: var(--text-primary); background: var(--bg-base); }
+    h1, h2, h3 { font-family: var(--font-display); font-weight: 400; line-height: 1.25; }
+
+    .top-nav { display: flex; align-items: center; justify-content: space-between; padding: var(--space-md) var(--space-2xl); background: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); position: sticky; top: 0; z-index: 100; }
+    .nav-brand { display: flex; align-items: center; gap: var(--space-sm); }
+    .nav-logo { font-size: var(--text-xl); }
+    .nav-title { font-family: var(--font-display); font-size: var(--text-lg); }
+    .nav-links { display: flex; gap: var(--space-xs); }
+    .nav-link { padding: var(--space-sm) var(--space-md); border-radius: var(--radius-sm); font-size: var(--text-sm); color: var(--text-secondary); transition: all 0.2s; }
+    .nav-link:hover { color: var(--text-primary); background: var(--bg-base); }
+    .nav-link.is-active { color: var(--color-primary-deep); background: oklch(96% 0.02 20); }
+    .nav-user { display: flex; align-items: center; gap: var(--space-md); }
+    .user-name { font-size: var(--text-sm); color: var(--text-secondary); }
+    .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--color-primary-light); color: var(--color-primary-deep); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: var(--text-sm); border: 2px solid var(--bg-base); }
+
+    .page { max-width: 1280px; margin: 0 auto; padding: var(--space-3xl) var(--space-2xl); }
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-xl); }
+    .page-title { font-size: var(--text-2xl); }
+    .btn-primary { padding: var(--space-sm) var(--space-lg); background: var(--color-primary); color: white; border: none; border-radius: var(--radius-md); font-size: var(--text-sm); font-weight: 500; font-family: inherit; cursor: pointer; transition: all 0.2s; }
+    .btn-primary:hover { background: var(--color-primary-deep); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+
+    /* Role Cards */
+    .role-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: var(--space-lg); }
+    .role-card { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: var(--space-xl); transition: all 0.2s; }
+    .role-card:hover { background: var(--bg-surface-hover); box-shadow: var(--shadow-sm); }
+    .role-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-md); }
+    .role-icon { width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--color-role-bg); color: var(--color-role); display: flex; align-items: center; justify-content: center; font-size: var(--text-lg); flex-shrink: 0; }
+    .role-title { font-family: var(--font-display); font-size: var(--text-lg); }
+    .role-org { font-size: var(--text-sm); color: var(--text-secondary); }
+    .role-time { font-size: var(--text-xs); color: var(--text-tertiary); margin-top: 2px; }
+    .role-desc { font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.6; margin-top: var(--space-md); padding-top: var(--space-md); border-top: 1px solid var(--border-subtle); }
+
+    @media (max-width: 768px) {
+      .page { padding: var(--space-xl) var(--space-lg); }
+      .page-header { flex-direction: column; align-items: flex-start; gap: var(--space-md); }
+      .role-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-nav">
+    <div class="nav-brand"><span class="nav-logo">🌱</span><span class="nav-title">成长规划</span></div>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">首页</a>
+      <a href="courses.html" class="nav-link">课程</a>
+      <a href="experiences.html" class="nav-link">经历</a>
+      <a href="achievements.html" class="nav-link">成就</a>
+      <a href="roles.html" class="nav-link is-active">角色</a>
+      <a href="ai-analysis.html" class="nav-link">AI分析</a>
+    </div>
+    <div class="nav-user"><span class="user-name">小明</span><a href="settings.html"><div class="user-avatar">明</div></a></div>
+  </nav>
+
+  <main class="page">
+    <div class="page-header">
+      <h1 class="page-title">角色管理</h1>
+      <button class="btn-primary">+ 添加角色</button>
+    </div>
+
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="role-header">
+          <div class="role-icon">🎓</div>
+          <div>
+            <div class="role-title">班级学习委员</div>
+            <div class="role-org">计算机科学与技术 3 班</div>
+            <div class="role-time">2024年9月 - 至今</div>
+          </div>
+        </div>
+        <div class="role-desc">负责班级学习事务协调，组织学习小组活动，协助老师收发作业，整理学习资料分享给同学。</div>
+      </div>
+      <div class="role-card">
+        <div class="role-header">
+          <div class="role-icon">🎤</div>
+          <div>
+            <div class="role-title">文艺部策划组组长</div>
+            <div class="role-org">学院学生会</div>
+            <div class="role-time">2025年3月 - 至今</div>
+          </div>
+        </div>
+        <div class="role-desc">负责学院各类文艺活动的策划与执行，主导迎新晚会、毕业晚会等大型活动的节目编排与舞台设计。</div>
+      </div>
+      <div class="role-card">
+        <div class="role-header">
+          <div class="role-icon">🤝</div>
+          <div>
+            <div class="role-title">校园志愿者</div>
+            <div class="role-org">校青年志愿者协会</div>
+            <div class="role-time">2024年10月 - 至今</div>
+          </div>
+        </div>
+        <div class="role-desc">累计志愿服务时长 80+ 小时，参与过迎新引导、图书馆整理、社区支教等多项志愿活动。</div>
+      </div>
+      <div class="role-card">
+        <div class="role-header">
+          <div class="role-icon">💻</div>
+          <div>
+            <div class="role-title">技术部部长</div>
+            <div class="role-org">ACM 程序设计社团</div>
+            <div class="role-time">2025年6月 - 至今</div>
+          </div>
+        </div>
+        <div class="role-desc">负责组织社团技术分享和训练，带领新成员学习算法与数据结构，协助组织校内编程比赛。</div>
+      </div>
+      <div class="role-card">
+        <div class="role-header">
+          <div class="role-icon">🏠</div>
+          <div>
+            <div class="role-title">寝室长</div>
+            <div class="role-org">12 栋 302 寝室</div>
+            <div class="role-time">2023年9月 - 至今</div>
+          </div>
+        </div>
+        <div class="role-desc">协调寝室日常事务，组织寝室卫生值日，维护寝室和谐氛围，寝室连续两年获评"文明寝室"。</div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

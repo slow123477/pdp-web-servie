@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 发展分析 - 成长规划</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-display: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Georgia', serif;
+      --font-body: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+      --text-xs: 0.75rem; --text-sm: 0.875rem; --text-base: 1rem;
+      --text-lg: 1.25rem; --text-xl: 1.5rem; --text-2xl: 2rem; --text-3xl: 2.5rem;
+      --space-xs: 0.25rem; --space-sm: 0.5rem; --space-md: 0.75rem;
+      --space-lg: 1rem; --space-xl: 1.5rem; --space-2xl: 2rem; --space-3xl: 3rem;
+      --bg-base: oklch(98% 0.008 30);
+      --bg-surface: oklch(96% 0.012 30);
+      --bg-surface-hover: oklch(94% 0.015 30);
+      --border-subtle: oklch(88% 0.015 30);
+      --text-primary: oklch(25% 0.02 30);
+      --text-secondary: oklch(48% 0.025 30);
+      --text-tertiary: oklch(62% 0.02 30);
+      --color-primary: oklch(70% 0.14 20);
+      --color-primary-deep: oklch(58% 0.16 20);
+      --color-primary-light: oklch(85% 0.08 20);
+      --color-ai: oklch(62% 0.15 300);
+      --color-ai-bg: oklch(96% 0.025 300);
+      --color-course: oklch(68% 0.12 195);
+      --color-experience: oklch(68% 0.12 155);
+      --color-achievement: oklch(70% 0.14 75);
+      --color-role: oklch(65% 0.13 280);
+      --radius-sm: 6px; --radius-md: 10px; --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px oklch(70% 0.01 30 / 0.06);
+      --shadow-md: 0 4px 12px oklch(70% 0.01 30 / 0.08);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-body); font-size: var(--text-base); line-height: 1.6; color: var(--text-primary); background: var(--bg-base); }
+    h1, h2, h3 { font-family: var(--font-display); font-weight: 400; line-height: 1.25; }
+
+    .top-nav { display: flex; align-items: center; justify-content: space-between; padding: var(--space-md) var(--space-2xl); background: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); position: sticky; top: 0; z-index: 100; }
+    .nav-brand { display: flex; align-items: center; gap: var(--space-sm); }
+    .nav-logo { font-size: var(--text-xl); }
+    .nav-title { font-family: var(--font-display); font-size: var(--text-lg); }
+    .nav-links { display: flex; gap: var(--space-xs); }
+    .nav-link { padding: var(--space-sm) var(--space-md); border-radius: var(--radius-sm); font-size: var(--text-sm); color: var(--text-secondary); transition: all 0.2s; }
+    .nav-link:hover { color: var(--text-primary); background: var(--bg-base); }
+    .nav-link.is-active { color: var(--color-primary-deep); background: oklch(96% 0.02 20); }
+    .nav-user { display: flex; align-items: center; gap: var(--space-md); }
+    .user-name { font-size: var(--text-sm); color: var(--text-secondary); }
+    .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--color-primary-light); color: var(--color-primary-deep); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: var(--text-sm); border: 2px solid var(--bg-base); }
+
+    .page { max-width: 1280px; margin: 0 auto; padding: var(--space-3xl) var(--space-2xl); }
+    .page-title { font-size: var(--text-2xl); margin-bottom: var(--space-xl); }
+    .btn-primary { padding: var(--space-sm) var(--space-lg); background: var(--color-ai); color: white; border: none; border-radius: var(--radius-md); font-size: var(--text-sm); font-weight: 500; font-family: inherit; cursor: pointer; transition: all 0.2s; }
+    .btn-primary:hover { background: oklch(55% 0.17 300); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+
+    /* Analysis Hero */
+    .analysis-hero {
+      background: var(--color-ai-bg); border: 1px solid oklch(88% 0.02 300);
+      border-radius: var(--radius-lg); padding: var(--space-3xl);
+      text-align: center; margin-bottom: var(--space-2xl);
+      position: relative; overflow: hidden;
+    }
+    .analysis-hero::before {
+      content: ''; position: absolute; top: -60px; right: -60px;
+      width: 180px; height: 180px; border-radius: 50%;
+      background: oklch(90% 0.04 300 / 0.25);
+    }
+    .analysis-hero-icon { font-size: var(--text-3xl); margin-bottom: var(--space-md); position: relative; }
+    .analysis-hero-title { font-family: var(--font-display); font-size: var(--text-2xl); color: var(--color-ai); margin-bottom: var(--space-sm); position: relative; }
+    .analysis-hero-desc { color: var(--text-secondary); max-width: 50ch; margin: 0 auto var(--space-xl); position: relative; }
+
+    /* Radar Chart (CSS) */
+    .radar-container { display: flex; justify-content: center; margin: var(--space-2xl) 0; }
+    .radar-chart {
+      width: 280px; height: 280px; position: relative;
+    }
+    .radar-bg {
+      position: absolute; inset: 0;
+      background: conic-gradient(from 270deg,
+        oklch(92% 0.02 300 / 0.3) 0deg 60deg,
+        oklch(92% 0.02 300 / 0.3) 60deg 120deg,
+        oklch(92% 0.02 300 / 0.3) 120deg 180deg,
+        oklch(92% 0.02 300 / 0.3) 180deg 240deg,
+        oklch(92% 0.02 300 / 0.3) 240deg 300deg,
+        oklch(92% 0.02 300 / 0.3) 300deg 360deg
+      );
+      border-radius: 50%;
+    }
+    .radar-poly {
+      position: absolute; inset: 20px;
+      background: oklch(70% 0.1 300 / 0.25);
+      clip-path: polygon(50% 5%, 88% 35%, 75% 85%, 25% 85%, 12% 35%);
+    }
+    .radar-label {
+      position: absolute; font-size: var(--text-xs); color: var(--text-secondary); font-weight: 500;
+    }
+    .radar-label.l1 { top: 0; left: 50%; transform: translateX(-50%); }
+    .radar-label.l2 { top: 28%; right: 0; }
+    .radar-label.l3 { bottom: 15%; right: 5%; }
+    .radar-label.l4 { bottom: 15%; left: 5%; }
+    .radar-label.l5 { top: 28%; left: 0; }
+
+    /* Analysis Grid */
+    .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-2xl); }
+    .analysis-card {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg); padding: var(--space-xl);
+    }
+    .analysis-card-title { font-size: var(--text-lg); margin-bottom: var(--space-lg); display: flex; align-items: center; gap: var(--space-sm); }
+    .analysis-list { list-style: none; display: flex; flex-direction: column; gap: var(--space-md); }
+    .analysis-list li { font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.6; padding-left: var(--space-lg); position: relative; }
+    .analysis-list li::before { content: '•'; position: absolute; left: 0; color: var(--color-primary); font-weight: bold; }
+    .strength .analysis-card-title { color: var(--color-experience); }
+    .weakness .analysis-card-title { color: var(--color-achievement); }
+    .suggestion .analysis-card-title { color: var(--color-course); }
+
+    /* History */
+    .history-section { margin-top: var(--space-3xl); }
+    .history-title { font-size: var(--text-xl); margin-bottom: var(--space-xl); }
+    .history-list { display: flex; flex-direction: column; gap: var(--space-md); }
+    .history-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-md) var(--space-lg);
+      background: var(--bg-surface); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md); transition: all 0.2s;
+    }
+    .history-item:hover { background: var(--bg-surface-hover); }
+    .history-date { font-size: var(--text-sm); color: var(--text-tertiary); }
+    .history-summary { font-size: var(--text-sm); color: var(--text-secondary); }
+    .history-action { font-size: var(--text-sm); color: var(--color-ai); cursor: pointer; }
+    .history-action:hover { text-decoration: underline; }
+
+    @media (max-width: 768px) {
+      .page { padding: var(--space-xl) var(--space-lg); }
+      .analysis-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .analysis-hero { padding: var(--space-xl); }
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-nav">
+    <div class="nav-brand"><span class="nav-logo">🌱</span><span class="nav-title">成长规划</span></div>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">首页</a>
+      <a href="courses.html" class="nav-link">课程</a>
+      <a href="experiences.html" class="nav-link">经历</a>
+      <a href="achievements.html" class="nav-link">成就</a>
+      <a href="roles.html" class="nav-link">角色</a>
+      <a href="ai-analysis.html" class="nav-link is-active">AI分析</a>
+    </div>
+    <div class="nav-user"><span class="user-name">小明</span><a href="settings.html"><div class="user-avatar">明</div></a></div>
+  </nav>
+
+  <main class="page">
+    <h1 class="page-title">AI 发展分析</h1>
+
+    <div class="analysis-hero">
+      <div class="analysis-hero-icon">✨</div>
+      <h2 class="analysis-hero-title">AI 智能分析报告</h2>
+      <p class="analysis-hero-desc">基于你录入的课程、经历、成就和角色数据，AI 为你生成个人发展分析报告</p>
+      <button class="btn-primary">重新生成分析报告</button>
+
+      <div class="radar-container">
+        <div class="radar-chart">
+          <div class="radar-bg"></div>
+          <div class="radar-poly"></div>
+          <span class="radar-label l1">学习能力</span>
+          <span class="radar-label l2">团队协作</span>
+          <span class="radar-label l3">领导力</span>
+          <span class="radar-label l4">创新思维</span>
+          <span class="radar-label l5">技术深度</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="analysis-grid">
+      <div class="analysis-card strength">
+        <h3 class="analysis-card-title">💪 核心优势</h3>
+        <ul class="analysis-list">
+          <li><strong>数据分析能力突出</strong>：数学建模竞赛获奖 + 科研项目中熟练使用 Python 进行数据处理</li>
+          <li><strong>团队协作经验丰富</strong>：多次参与团队竞赛和项目，担任过多种团队角色</li>
+          <li><strong>学习能力强</strong>：GPA 持续上升，从大一 3.2 提升到大三 3.72</li>
+          <li><strong>组织能力优秀</strong>：担任学生会文艺部策划组组长，成功组织多场大型活动</li>
+        </ul>
+      </div>
+      <div class="analysis-card weakness">
+        <h3 class="analysis-card-title">🎯 待提升领域</h3>
+        <ul class="analysis-list">
+          <li><strong>算法深度不足</strong>：数据结构课程成绩虽好，但缺少算法竞赛经历，建议补充 LeetCode 训练</li>
+          <li><strong>实习经历较少</strong>：目前仅申请过 1 份实习，建议大三暑假积极寻找实习机会</li>
+          <li><strong>英语能力待加强</strong>：大学英语成绩中等，建议备考 CET-6 或雅思</li>
+        </ul>
+      </div>
+      <div class="analysis-card suggestion">
+        <h3 class="analysis-card-title">📋 发展建议</h3>
+        <ul class="analysis-list">
+          <li>大三暑假争取进入互联网公司实习，积累工程实践经验</li>
+          <li>补充机器学习/深度学习相关课程或项目，增强技术竞争力</li>
+          <li>考虑将科研项目成果整理为论文或专利，提升学术影响力</li>
+          <li>准备保研/考研或秋招，根据目标制定不同的准备策略</li>
+        </ul>
+      </div>
+      <div class="analysis-card">
+        <h3 class="analysis-card-title">🎓 竞争力评估</h3>
+        <ul class="analysis-list">
+          <li><strong>保研竞争力</strong>：中等偏上（GPA + 竞赛奖项有优势，建议补充科研论文）</li>
+          <li><strong>就业竞争力</strong>：中等（技术基础扎实，实习经历偏少，建议补充大厂实习）</li>
+          <li><strong>出国竞争力</strong>：中等（需要提升英语成绩，补充科研项目经历）</li>
+          <li><strong>综合推荐</strong>：当前阶段建议优先考虑保研或就业，同步积累实习经验</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="history-section">
+      <h2 class="history-title">历史分析记录</h2>
+      <div class="history-list">
+        <div class="history-item">
+          <span class="history-date">2026年4月15日</span>
+          <span class="history-summary">能力评估 · 发展方向 · 简历优化建议</span>
+          <span class="history-action">查看详情</span>
+        </div>
+        <div class="history-item">
+          <span class="history-date">2026年1月10日</span>
+          <span class="history-summary">能力评估 · 发展方向</span>
+          <span class="history-action">查看详情</span>
+        </div>
+        <div class="history-item">
+          <span class="history-date">2025年9月5日</span>
+          <span class="history-summary">能力评估</span>
+          <span class="history-action">查看详情</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

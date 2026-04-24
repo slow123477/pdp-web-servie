@@ -13,16 +13,34 @@ const form = reactive({
   password: '',
   confirmPassword: '',
 })
+const formError = ref('')
+
+function clearError() {
+  formError.value = ''
+}
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
 
 async function handleRegister() {
   if (!form.username || !form.email || !form.password) {
     ElMessage.warning('请填写完整信息')
     return
   }
-  if (form.password !== form.confirmPassword) {
-    ElMessage.warning('两次输入的密码不一致')
+  if (!isValidEmail(form.email)) {
+    formError.value = '请输入有效的邮箱地址'
     return
   }
+  if (form.password.length < 6) {
+    formError.value = '密码长度至少为 6 位'
+    return
+  }
+  if (form.password !== form.confirmPassword) {
+    formError.value = '两次输入的密码不一致'
+    return
+  }
+  formError.value = ''
   loading.value = true
   try {
     await request.post('/auth/register', {
@@ -33,7 +51,7 @@ async function handleRegister() {
     ElMessage.success('注册成功，请登录')
     router.push('/login')
   } catch (error) {
-    console.error(error)
+    formError.value = error.message || '注册失败，请稍后再试'
   } finally {
     loading.value = false
   }
@@ -58,6 +76,8 @@ async function handleRegister() {
         <p class="form-subtitle">开启你的成长规划之旅</p>
 
         <form class="auth-form" @submit.prevent="handleRegister">
+          <div v-if="formError" class="form-error">{{ formError }}</div>
+
           <div class="form-group">
             <label for="reg-username">用户名</label>
             <input
@@ -66,17 +86,19 @@ async function handleRegister() {
               type="text"
               placeholder="设置你的用户名"
               autocomplete="username"
+              @focus="clearError"
             />
           </div>
 
           <div class="form-group">
-            <label for="reg-email">邮箱 / 学号</label>
+            <label for="reg-email">邮箱</label>
             <input
               id="reg-email"
               v-model="form.email"
               type="text"
-              placeholder="请输入邮箱或学号"
+              placeholder="请输入邮箱"
               autocomplete="email"
+              @focus="clearError"
             />
           </div>
 
@@ -88,6 +110,7 @@ async function handleRegister() {
               type="password"
               placeholder="设置登录密码（至少6位）"
               autocomplete="new-password"
+              @focus="clearError"
             />
           </div>
 
@@ -99,6 +122,7 @@ async function handleRegister() {
               type="password"
               placeholder="再次输入密码"
               autocomplete="new-password"
+              @focus="clearError"
             />
           </div>
 
@@ -295,6 +319,16 @@ async function handleRegister() {
   color: oklch(58% 0.16 20);
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+.form-error {
+  padding: 0.75rem 1rem;
+  background: oklch(95% 0.03 25);
+  border: 1px solid oklch(85% 0.08 25);
+  border-radius: 10px;
+  color: oklch(50% 0.16 25);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
 }
 
 /* Responsive */

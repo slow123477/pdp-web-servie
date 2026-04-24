@@ -14,21 +14,27 @@ const form = reactive({
   username: '',
   password: '',
 })
+const formError = ref('')
+
+function clearError() {
+  formError.value = ''
+}
 
 async function handleLogin() {
   if (!form.username || !form.password) {
     ElMessage.warning('请输入用户名和密码')
     return
   }
+  formError.value = ''
   loading.value = true
   try {
     const res = await request.post('/auth/login', form)
-    userStore.setToken(res.token)
-    userStore.setUserInfo(res)
-    ElMessage.success('登录成功')
+    userStore.setToken(res.token, rememberMe.value)
+    userStore.setUserInfo(res, rememberMe.value)
+    ElMessage.success('登录成功，欢迎回来！')
     router.push('/dashboard')
   } catch (error) {
-    console.error(error)
+    formError.value = error.message || '登录失败，请检查用户名和密码'
   } finally {
     loading.value = false
   }
@@ -53,14 +59,17 @@ async function handleLogin() {
         <p class="form-subtitle">登录你的成长规划账号</p>
 
         <form class="auth-form" @submit.prevent="handleLogin">
+          <div v-if="formError" class="form-error">{{ formError }}</div>
+
           <div class="form-group">
-            <label for="login-username">邮箱 / 学号</label>
+            <label for="login-username">用户名</label>
             <input
               id="login-username"
               v-model="form.username"
               type="text"
-              placeholder="请输入邮箱或学号"
+              placeholder="请输入用户名或邮箱"
               autocomplete="username"
+              @focus="clearError"
               @keyup.enter="handleLogin"
             />
           </div>
@@ -73,6 +82,7 @@ async function handleLogin() {
               type="password"
               placeholder="请输入密码"
               autocomplete="current-password"
+              @focus="clearError"
               @keyup.enter="handleLogin"
             />
           </div>
@@ -312,6 +322,16 @@ async function handleLogin() {
   color: oklch(58% 0.16 20);
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+.form-error {
+  padding: 0.75rem 1rem;
+  background: oklch(95% 0.03 25);
+  border: 1px solid oklch(85% 0.08 25);
+  border-radius: 10px;
+  color: oklch(50% 0.16 25);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
 }
 
 /* Responsive */

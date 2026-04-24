@@ -1,12 +1,725 @@
 <script setup>
+import { ref, reactive, computed, onMounted } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import request from '@/utils/request'
+
+// 筛选条件
+const filterSemester = ref('')
+const filterType = ref('')
+
+// 分页
+const currentPage = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
+
+// 课程列表
+const courseList = ref([])
+const loading = ref(false)
+
+// 弹窗
+const dialogVisible = ref(false)
+const dialogTitle = ref('添加课程')
+const isEdit = ref(false)
+const formRef = ref(null)
+
+const form = reactive({
+  id: null,
+  courseName: '',
+  courseType: '必修',
+  credits: null,
+  semester: '',
+  academicYear: '',
+  score: null,
+  gradePoint: null,
+})
+
+const rules = {
+  courseName: [{ required: true, message: '请输入课程名称', trigger: 'blur' }],
+  courseType: [{ required: true, message: '请选择课程类型', trigger: 'change' }],
+  credits: [{ required: true, message: '请输入学分', trigger: 'blur' }],
+  semester: [{ required: true, message: '请输入学期', trigger: 'blur' }],
+}
+
+const semesterOptions = [
+  '2024-2025-1',
+  '2024-2025-2',
+  '2023-2024-1',
+  '2023-2024-2',
+  '2022-2023-1',
+  '2022-2023-2',
+]
+
+const typeOptions = ['必修', '选修', '通识']
+
+// Mock 数据
+const mockData = [
+  {
+    id: 1,
+    courseName: '数据结构与算法',
+    courseType: '必修',
+    credits: 4.0,
+    semester: '2024-2025-2',
+    academicYear: '2024-2025',
+    score: 92.0,
+    gradePoint: 4.0,
+  },
+  {
+    id: 2,
+    courseName: '机器学习导论',
+    courseType: '选修',
+    credits: 3.0,
+    semester: '2024-2025-2',
+    academicYear: '2024-2025',
+    score: 88.0,
+    gradePoint: 3.7,
+  },
+  {
+    id: 3,
+    courseName: '软件工程实践',
+    courseType: '必修',
+    credits: 3.0,
+    semester: '2024-2025-2',
+    academicYear: '2024-2025',
+    score: 95.0,
+    gradePoint: 4.0,
+  },
+  {
+    id: 4,
+    courseName: '大学英语（四）',
+    courseType: '通识',
+    credits: 2.0,
+    semester: '2024-2025-2',
+    academicYear: '2024-2025',
+    score: 85.0,
+    gradePoint: 3.3,
+  },
+  {
+    id: 5,
+    courseName: '计算机网络',
+    courseType: '必修',
+    credits: 3.0,
+    semester: '2024-2025-1',
+    academicYear: '2024-2025',
+    score: 90.0,
+    gradePoint: 4.0,
+  },
+  {
+    id: 6,
+    courseName: '操作系统原理',
+    courseType: '必修',
+    credits: 4.0,
+    semester: '2024-2025-1',
+    academicYear: '2024-2025',
+    score: 87.0,
+    gradePoint: 3.7,
+  },
+  {
+    id: 7,
+    courseName: '数据库系统',
+    courseType: '必修',
+    credits: 3.0,
+    semester: '2023-2024-2',
+    academicYear: '2023-2024',
+    score: 91.0,
+    gradePoint: 4.0,
+  },
+  {
+    id: 8,
+    courseName: 'Web 前端开发',
+    courseType: '选修',
+    credits: 2.0,
+    semester: '2023-2024-2',
+    academicYear: '2023-2024',
+    score: 94.0,
+    gradePoint: 4.0,
+  },
+]
+
+// 筛选后的列表
+const filteredList = computed(() => {
+  let list = courseList.value
+  if (filterSemester.value) {
+    list = list.filter((item) => item.semester === filterSemester.value)
+  }
+  if (filterType.value) {
+    list = list.filter((item) => item.courseType === filterType.value)
+  }
+  return list
+})
+
+// 分页后的列表
+const paginatedList = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  return filteredList.value.slice(start, start + pageSize.value)
+})
+
+function fetchList() {
+  loading.value = true
+  // 后端未实现时先用 mock 数据
+  setTimeout(() => {
+    courseList.value = mockData
+    total.value = mockData.length
+    loading.value = false
+  }, 300)
+
+  // 后端实现后切换为真实请求
+  // request.get('/courses', {
+  //   params: {
+  //     semester: filterSemester.value || undefined,
+  //     courseType: filterType.value || undefined,
+  //     page: currentPage.value,
+  //     pageSize: pageSize.value,
+  //   },
+  // }).then((res) => {
+  //   courseList.value = res.rows
+  //   total.value = res.total
+  // }).finally(() => {
+  //   loading.value = false
+  // })
+}
+
+function handleFilter() {
+  currentPage.value = 1
+  fetchList()
+}
+
+function resetFilter() {
+  filterSemester.value = ''
+  filterType.value = ''
+  currentPage.value = 1
+  fetchList()
+}
+
+function openAddDialog() {
+  isEdit.value = false
+  dialogTitle.value = '添加课程'
+  resetForm()
+  dialogVisible.value = true
+}
+
+function openEditDialog(row) {
+  isEdit.value = true
+  dialogTitle.value = '编辑课程'
+  Object.assign(form, row)
+  dialogVisible.value = true
+}
+
+function resetForm() {
+  form.id = null
+  form.courseName = ''
+  form.courseType = '必修'
+  form.credits = null
+  form.semester = ''
+  form.academicYear = ''
+  form.score = null
+  form.gradePoint = null
+}
+
+function handleSubmit() {
+  formRef.value?.validate((valid) => {
+    if (!valid) return
+    if (isEdit.value) {
+      handleUpdate()
+    } else {
+      handleAdd()
+    }
+  })
+}
+
+function handleAdd() {
+  // 模拟添加成功
+  const newCourse = {
+    id: Date.now(),
+    ...form,
+  }
+  courseList.value.unshift(newCourse)
+  total.value++
+  ElMessage.success('添加成功')
+  dialogVisible.value = false
+
+  // 后端实现后切换为真实请求
+  // request.post('/courses', form).then(() => {
+  //   ElMessage.success('添加成功')
+  //   dialogVisible.value = false
+  //   fetchList()
+  // })
+}
+
+function handleUpdate() {
+  // 模拟更新成功
+  const index = courseList.value.findIndex((item) => item.id === form.id)
+  if (index > -1) {
+    courseList.value[index] = { ...form }
+  }
+  ElMessage.success('修改成功')
+  dialogVisible.value = false
+
+  // 后端实现后切换为真实请求
+  // request.put('/courses', form).then(() => {
+  //   ElMessage.success('修改成功')
+  //   dialogVisible.value = false
+  //   fetchList()
+  // })
+}
+
+function handleDelete(row) {
+  ElMessageBox.confirm(`确定要删除课程「${row.courseName}」吗？`, '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(() => {
+    // 模拟删除成功
+    courseList.value = courseList.value.filter((item) => item.id !== row.id)
+    total.value--
+    ElMessage.success('删除成功')
+
+    // 后端实现后切换为真实请求
+    // request.delete(`/courses/${row.id}`).then(() => {
+    //   ElMessage.success('删除成功')
+    //   fetchList()
+    // })
+  })
+}
+
+function handlePageChange(page) {
+  currentPage.value = page
+}
+
+onMounted(() => {
+  fetchList()
+})
 </script>
 
 <template>
-  <div class="page-container">
+  <div class="page">
+    <!-- Page Header -->
     <div class="page-header">
-      <h2 class="page-title">课程管理</h2>
-      <p class="page-subtitle">管理您的课程信息与成绩</p>
+      <h1 class="page-title">课程管理</h1>
+      <button class="btn-primary" @click="openAddDialog">+ 添加课程</button>
     </div>
-    <el-empty description="课程管理内容待开发" />
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <select v-model="filterSemester" @change="handleFilter">
+        <option value="">全部学期</option>
+        <option v-for="s in semesterOptions" :key="s" :value="s">{{ s }}</option>
+      </select>
+      <select v-model="filterType" @change="handleFilter">
+        <option value="">全部类型</option>
+        <option v-for="t in typeOptions" :key="t" :value="t">{{ t }}</option>
+      </select>
+      <button v-if="filterSemester || filterType" class="btn-text" @click="resetFilter">
+        重置筛选
+      </button>
+    </div>
+
+    <!-- Course List -->
+    <div v-if="loading" class="loading-state">加载中...</div>
+    <div v-else class="course-list">
+      <div
+        v-for="item in paginatedList"
+        :key="item.id"
+        class="course-item"
+      >
+        <div class="course-info">
+          <div class="course-icon">📖</div>
+          <div>
+            <div class="course-name">{{ item.courseName }}</div>
+          </div>
+          <span class="course-tag">{{ item.courseType }}</span>
+        </div>
+        <div class="course-meta">
+          <span>{{ item.credits }} 学分</span>
+          <span>{{ item.semester }}</span>
+          <span class="course-grade">{{ item.score ?? '-' }}</span>
+          <div class="course-actions">
+            <button class="action-btn" @click="openEditDialog(item)">编辑</button>
+            <button class="action-btn danger" @click="handleDelete(item)">删除</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div v-if="!loading && paginatedList.length === 0" class="empty-state">
+      <div class="empty-state-icon">📚</div>
+      <div class="empty-state-text">暂无课程数据</div>
+      <button class="btn-primary" @click="openAddDialog">添加第一门课程</button>
+    </div>
+
+    <!-- Pagination -->
+    <div v-if="filteredList.length > pageSize" class="pagination-wrapper">
+      <el-pagination
+        v-model:current-page="currentPage"
+        :page-size="pageSize"
+        :total="filteredList.length"
+        layout="prev, pager, next"
+        @current-change="handlePageChange"
+      />
+    </div>
+
+    <!-- Add/Edit Dialog -->
+    <el-dialog
+      v-model="dialogVisible"
+      :title="dialogTitle"
+      width="520px"
+      :close-on-click-modal="false"
+      @closed="resetForm"
+    >
+      <el-form
+        ref="formRef"
+        :model="form"
+        :rules="rules"
+        label-width="80px"
+        class="course-form"
+      >
+        <el-form-item label="课程名称" prop="courseName">
+          <el-input v-model="form.courseName" placeholder="请输入课程名称" />
+        </el-form-item>
+        <el-form-item label="课程类型" prop="courseType">
+          <el-select v-model="form.courseType" placeholder="请选择">
+            <el-option label="必修" value="必修" />
+            <el-option label="选修" value="选修" />
+            <el-option label="通识" value="通识" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="学分" prop="credits">
+          <el-input-number v-model="form.credits" :min="0" :max="10" :step="0.5" />
+        </el-form-item>
+        <el-form-item label="学期" prop="semester">
+          <el-input v-model="form.semester" placeholder="如 2024-2025-1" />
+        </el-form-item>
+        <el-form-item label="学年">
+          <el-input v-model="form.academicYear" placeholder="如 2024-2025" />
+        </el-form-item>
+        <el-form-item label="成绩">
+          <el-input-number v-model="form.score" :min="0" :max="100" :step="0.1" />
+        </el-form-item>
+        <el-form-item label="绩点">
+          <el-input-number v-model="form.gradePoint" :min="0" :max="5" :step="0.01" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <button class="btn-secondary" @click="dialogVisible = false">取消</button>
+          <button class="btn-primary" @click="handleSubmit">确定</button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
+
+<style scoped lang="scss">
+.page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.page-title {
+  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    'Georgia', serif;
+  font-size: 2rem;
+  font-weight: 400;
+  color: oklch(25% 0.02 30);
+}
+
+.btn-primary {
+  padding: 0.5rem 1rem;
+  background: oklch(70% 0.14 20);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: oklch(58% 0.16 20);
+  box-shadow: 0 4px 12px oklch(70% 0.01 30 / 0.08);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  color: oklch(48% 0.025 30);
+  border: 1px solid oklch(88% 0.015 30);
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-right: 0.5rem;
+}
+
+.btn-secondary:hover {
+  background: oklch(96% 0.012 30);
+}
+
+.btn-text {
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  color: oklch(70% 0.14 20);
+  border: none;
+  font-size: 0.875rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.btn-text:hover {
+  color: oklch(58% 0.16 20);
+  text-decoration: underline;
+}
+
+/* Filter */
+.filter-bar {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.filter-bar select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid oklch(88% 0.015 30);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: oklch(25% 0.02 30);
+  background: oklch(96% 0.012 30);
+  cursor: pointer;
+  min-width: 120px;
+}
+
+/* Course List */
+.course-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.course-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: oklch(96% 0.012 30);
+  border: 1px solid oklch(88% 0.015 30);
+  border-radius: 16px;
+  transition: all 0.2s ease;
+}
+
+.course-item:hover {
+  background: oklch(94% 0.015 30);
+  box-shadow: 0 1px 2px oklch(70% 0.01 30 / 0.06);
+}
+
+.course-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.course-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  background: oklch(96% 0.02 195);
+  color: oklch(68% 0.12 195);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.course-name {
+  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    'Georgia', serif;
+  font-size: 1.25rem;
+  color: oklch(25% 0.02 30);
+}
+
+.course-tag {
+  font-size: 0.75rem;
+  padding: 2px 10px;
+  border-radius: 100px;
+  background: oklch(96% 0.02 195);
+  color: oklch(68% 0.12 195);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.course-meta {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.course-meta span {
+  font-size: 0.875rem;
+  color: oklch(48% 0.025 30);
+}
+
+.course-grade {
+  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    'Georgia', serif;
+  font-size: 1.5rem;
+  color: oklch(58% 0.16 20);
+  min-width: 40px;
+  text-align: center;
+}
+
+.course-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  padding: 0.25rem 0.75rem;
+  background: transparent;
+  color: oklch(48% 0.025 30);
+  border: 1px solid oklch(88% 0.015 30);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background: oklch(94% 0.015 30);
+  color: oklch(25% 0.02 30);
+}
+
+.action-btn.danger {
+  color: oklch(55% 0.18 25);
+  border-color: oklch(80% 0.1 25);
+}
+
+.action-btn.danger:hover {
+  background: oklch(95% 0.03 25);
+}
+
+/* Loading & Empty */
+.loading-state {
+  text-align: center;
+  padding: 4rem;
+  color: oklch(62% 0.02 30);
+  font-size: 0.875rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: oklch(62% 0.02 30);
+}
+
+.empty-state-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.5;
+}
+
+.empty-state-text {
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Pagination */
+.pagination-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+/* Dialog */
+:deep(.el-dialog__header) {
+  margin-right: 0;
+  padding: 1.5rem 1.5rem 0.75rem;
+}
+
+:deep(.el-dialog__title) {
+  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    'Georgia', serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: oklch(25% 0.02 30);
+}
+
+:deep(.el-dialog__body) {
+  padding: 1rem 1.5rem;
+}
+
+:deep(.el-dialog__footer) {
+  padding: 0.75rem 1.5rem 1.5rem;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.course-form :deep(.el-form-item__label) {
+  color: oklch(48% 0.025 30);
+  font-weight: 500;
+}
+
+.course-form :deep(.el-input__wrapper) {
+  background: oklch(98% 0.008 30);
+  box-shadow: 0 0 0 1px oklch(88% 0.015 30) inset;
+}
+
+.course-form :deep(.el-input__wrapper.is-focus) {
+  box-shadow: 0 0 0 1px oklch(70% 0.14 20) inset;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .page {
+    padding: 1.5rem 1rem;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .course-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .course-meta {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+
+/* Accessibility */
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid oklch(70% 0.14 20);
+  outline-offset: 2px;
+}
+</style>

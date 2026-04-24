@@ -1,4 +1,4 @@
-package com.slow.pojo.entity;
+package com.slow.pojo.vo;
 
 import lombok.Data;
 
@@ -6,12 +6,12 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * 课程实体
+ * 课程视图对象
  */
 @Data
-public class Course {
+public class CourseVO {
+
     private Long id;
-    private Long userId;
     private String courseName;
     private String courseType;
     private BigDecimal credits;

@@ -22,7 +22,13 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/auth/login",
                         "/auth/register",
-                        "/upload/**"
+                        "/upload/**",
+                        "/doc.html",
+                        "/webjars/**",
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/favicon.ico",
+                        "/courses/**"
                 );
     }
 }

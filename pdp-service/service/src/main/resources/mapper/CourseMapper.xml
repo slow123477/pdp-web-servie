@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.slow.service.mapper.CourseMapper">
+
+    <resultMap id="BaseResultMap" type="com.slow.pojo.entity.Course">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="course_name" property="courseName"/>
+        <result column="course_type" property="courseType"/>
+        <result column="credits" property="credits"/>
+        <result column="semester" property="semester"/>
+        <result column="academic_year" property="academicYear"/>
+        <result column="score" property="score"/>
+        <result column="grade_point" property="gradePoint"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, course_name, course_type, credits, semester, academic_year, score, grade_point, created_at, updated_at
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM courses
+        <where>
+            user_id = #{userId}
+            <if test="semester != null and semester != ''">
+                AND semester = #{semester}
+            </if>
+            <if test="courseType != null and courseType != ''">
+                AND course_type = #{courseType}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM courses
+        WHERE id = #{id} AND user_id = #{userId}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO courses (user_id, course_name, course_type, credits, semester, academic_year, score, grade_point)
+        VALUES (#{userId}, #{courseName}, #{courseType}, #{credits}, #{semester}, #{academicYear}, #{score}, #{gradePoint})
+    </insert>
+
+    <update id="update">
+        UPDATE courses
+        <set>
+            <if test="courseName != null">course_name = #{courseName},</if>
+            <if test="courseType != null">course_type = #{courseType},</if>
+            <if test="credits != null">credits = #{credits},</if>
+            <if test="semester != null">semester = #{semester},</if>
+            <if test="academicYear != null">academic_year = #{academicYear},</if>
+            <if test="score != null">score = #{score},</if>
+            <if test="gradePoint != null">grade_point = #{gradePoint}</if>
+        </set>
+        WHERE id = #{id} AND user_id = #{userId}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM courses WHERE id = #{id} AND user_id = #{userId}
+    </delete>
+
+</mapper>

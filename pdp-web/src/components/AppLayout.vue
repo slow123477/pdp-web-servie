@@ -12,7 +12,7 @@ const activeMenu = computed(() => route.path)
 
 const menuItems = computed(() => {
   const layoutRoute = router.getRoutes().find((r) => r.path === '/')
-  const hiddenPaths = ['profile', 'settings', 'grades', 'data']
+  const hiddenPaths = ['profile', 'settings', 'data']
   return (
     layoutRoute?.children
       ?.filter((r) => r.meta?.title && !hiddenPaths.includes(r.name))

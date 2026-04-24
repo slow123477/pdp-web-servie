@@ -33,11 +33,9 @@ public class AuthController {
     @PostMapping("/register")
     public Result<AuthVO> register(@RequestBody @Valid UserRegisterDTO dto) {
         User user = userService.register(dto);
-        String token = generateToken(user);
 
         AuthVO vo = new AuthVO();
         BeanUtils.copyProperties(user, vo);
-        vo.setToken(token);
 
         return Result.success("注册成功", vo);
     }
@@ -59,7 +57,7 @@ public class AuthController {
     @GetMapping("/user")
     public Result<UserVO> getCurrentUser() {
         // 从ThreadLocal获取JWT解析后的Claims（由JwtTokenInterceptor放入）
-        Claims claims = (Claims) ThreadLocalUtil.get();
+        Claims claims = ThreadLocalUtil.get();
 
         // JWT claims中的数字默认是Integer类型，需转换为Long
         Integer idInt = claims.get("id", Integer.class);

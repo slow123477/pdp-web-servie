@@ -11,7 +11,7 @@ public class UserProfileUpdateDTO {
     @NotNull(message = "用户ID不能为空")
     private Long id;
 
-    @Size(max = 50, message = "真实姓名长度不能超过50")
+    @Size(max = 10, message = "真实姓名长度不能超过50")
     private String realName;
 
     @Size(max = 500, message = "头像URL长度不能超过500")

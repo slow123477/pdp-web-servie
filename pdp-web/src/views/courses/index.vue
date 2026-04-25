@@ -209,50 +209,58 @@ function handleSubmit() {
   })
 }
 
-function handleAdd() {
-  request.post('/courses', {
-    courseName: form.courseName,
-    courseType: form.courseType,
-    credits: form.credits,
-    semester: form.semester,
-    academicYear: form.academicYear,
-    score: form.score,
-    gradePoint: form.gradePoint,
-  }).then(() => {
+async function handleAdd() {
+  try {
+    await request.post('/courses', {
+      courseName: form.courseName,
+      courseType: form.courseType,
+      credits: form.credits,
+      semester: form.semester,
+      academicYear: form.academicYear,
+      score: form.score,
+      gradePoint: form.gradePoint,
+    })
     ElMessage.success('添加成功')
     dialogVisible.value = false
     fetchList()
-  })
+  } catch (error) {
+    console.error(error)
+  }
 }
 
-function handleUpdate() {
-  request.put('/courses', {
-    id: form.id,
-    courseName: form.courseName,
-    courseType: form.courseType,
-    credits: form.credits,
-    semester: form.semester,
-    academicYear: form.academicYear,
-    score: form.score,
-    gradePoint: form.gradePoint,
-  }).then(() => {
+async function handleUpdate() {
+  try {
+    await request.put('/courses', {
+      id: form.id,
+      courseName: form.courseName,
+      courseType: form.courseType,
+      credits: form.credits,
+      semester: form.semester,
+      academicYear: form.academicYear,
+      score: form.score,
+      gradePoint: form.gradePoint,
+    })
     ElMessage.success('修改成功')
     dialogVisible.value = false
     fetchList()
-  })
+  } catch (error) {
+    console.error(error)
+  }
 }
 
-function handleDelete(row) {
-  ElMessageBox.confirm(`确定要删除课程「${row.courseName}」吗？`, '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
-  }).then(() => {
-    request.delete(`/courses/${row.id}`).then(() => {
-      ElMessage.success('删除成功')
-      fetchList()
+async function handleDelete(row) {
+  try {
+    await ElMessageBox.confirm(`确定要删除课程「${row.courseName}」吗？`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
     })
-  })
+    await request.delete(`/courses/${row.id}`)
+    ElMessage.success('删除成功')
+    fetchList()
+  } catch (error) {
+    if (error !== 'cancel') console.error(error)
+  }
 }
 
 function handlePageChange(page) {

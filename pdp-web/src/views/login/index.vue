@@ -1,11 +1,12 @@
 <script setup>
 import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import request from '@/utils/request'
 import { ElMessage } from 'element-plus'
 
 const router = useRouter()
+const route = useRoute()
 const userStore = useUserStore()
 
 const loading = ref(false)
@@ -29,10 +30,15 @@ async function handleLogin() {
   loading.value = true
   try {
     const res = await request.post('/auth/login', form)
+    if (!res || !res.token) {
+      formError.value = '登录响应异常，请刷新后重试'
+      return
+    }
     userStore.setToken(res.token, rememberMe.value)
     userStore.setUserInfo(res, rememberMe.value)
     ElMessage.success('登录成功，欢迎回来！')
-    router.push('/dashboard')
+    const redirect = route.query.redirect || '/dashboard'
+    await router.push(redirect)
   } catch (error) {
     formError.value = error.message || '登录失败，请检查用户名和密码'
   } finally {

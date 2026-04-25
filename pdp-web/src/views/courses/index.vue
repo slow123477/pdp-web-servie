@@ -135,23 +135,7 @@ const mockData = [
   },
 ]
 
-// 筛选后的列表
-const filteredList = computed(() => {
-  let list = courseList.value
-  if (filterSemester.value) {
-    list = list.filter((item) => item.semester === filterSemester.value)
-  }
-  if (filterType.value) {
-    list = list.filter((item) => item.courseType === filterType.value)
-  }
-  return list
-})
-
-// 分页后的列表
-const paginatedList = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value
-  return filteredList.value.slice(start, start + pageSize.value)
-})
+// 课程列表和分页由后端处理
 
 function fetchList() {
   loading.value = true
@@ -226,7 +210,8 @@ function handleSubmit() {
 }
 
 function handleAdd() {
-  request.post('/courses', form).then(() => {
+  const { id, ...payload } = form
+  request.post('/courses', payload).then(() => {
     ElMessage.success('添加成功')
     dialogVisible.value = false
     fetchList()
@@ -256,6 +241,7 @@ function handleDelete(row) {
 
 function handlePageChange(page) {
   currentPage.value = page
+  fetchList()
 }
 
 onMounted(() => {
@@ -290,7 +276,7 @@ onMounted(() => {
     <div v-if="loading" class="loading-state">加载中...</div>
     <div v-else class="course-list">
       <div
-        v-for="item in paginatedList"
+        v-for="item in courseList"
         :key="item.id"
         class="course-item"
       >
@@ -314,18 +300,18 @@ onMounted(() => {
     </div>
 
     <!-- Empty State -->
-    <div v-if="!loading && paginatedList.length === 0" class="empty-state">
+    <div v-if="!loading && courseList.length === 0" class="empty-state">
       <div class="empty-state-icon">📚</div>
       <div class="empty-state-text">暂无课程数据</div>
       <button class="btn-primary" @click="openAddDialog">添加第一门课程</button>
     </div>
 
     <!-- Pagination -->
-    <div v-if="filteredList.length > pageSize" class="pagination-wrapper">
+    <div v-if="total > pageSize" class="pagination-wrapper">
       <el-pagination
         v-model:current-page="currentPage"
         :page-size="pageSize"
-        :total="filteredList.length"
+        :total="total"
         layout="prev, pager, next"
         @current-change="handlePageChange"
       />

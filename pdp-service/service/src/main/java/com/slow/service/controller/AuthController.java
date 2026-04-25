@@ -33,9 +33,11 @@ public class AuthController {
     @PostMapping("/register")
     public Result<AuthVO> register(@RequestBody @Valid UserRegisterDTO dto) {
         User user = userService.register(dto);
+        String token = generateToken(user);
 
         AuthVO vo = new AuthVO();
         BeanUtils.copyProperties(user, vo);
+        vo.setToken(token);
 
         return Result.success("注册成功", vo);
     }
@@ -47,7 +49,10 @@ public class AuthController {
         String token = generateToken(user);
 
         AuthVO vo = new AuthVO();
-        BeanUtils.copyProperties(user, vo);
+        vo.setId(user.getId());
+        vo.setUsername(user.getUsername());
+        vo.setRealName(user.getRealName());
+        vo.setAvatar(user.getAvatar());
         vo.setToken(token);
 
         return Result.success("登录成功", vo);

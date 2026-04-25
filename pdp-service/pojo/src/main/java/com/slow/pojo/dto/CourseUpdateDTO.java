@@ -18,6 +18,7 @@ public class CourseUpdateDTO {
     @NotBlank(message = "课程名称不能为空")
     private String courseName;
 
+    @NotBlank(message = "课程类型不能为空")
     private String courseType;
 
     @NotNull(message = "学分不能为空")

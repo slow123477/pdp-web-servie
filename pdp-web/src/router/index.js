@@ -87,12 +87,10 @@ const router = createRouter({
 })
 
 // 路由守卫
-router.beforeEach((to, from, next) => {
+router.beforeEach((to) => {
   const userStore = useUserStore()
   if (!to.meta.public && !userStore.isLoggedIn) {
-    next('/login')
-  } else {
-    next()
+    return { name: 'login', query: { redirect: to.fullPath } }
   }
 })
 

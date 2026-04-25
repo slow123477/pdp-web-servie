@@ -1,7 +1,8 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
+import request from '@/utils/request'
 
 const userStore = useUserStore()
 const router = useRouter()
@@ -11,41 +12,62 @@ const username = computed(() => userStore.userInfo?.username || '同学')
 const today = new Date()
 const dateStr = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`
 
-const gpaHistory = [
-  { semester: '大一上', gpa: 3.2, height: 68 },
-  { semester: '大一下', gpa: 3.45, height: 75 },
-  { semester: '大二上', gpa: 3.55, height: 78 },
-  { semester: '大二下', gpa: 3.6, height: 82 },
-  { semester: '大三上', gpa: 3.68, height: 85 },
-  { semester: '大三下', gpa: 3.72, height: 93, current: true },
-]
+const loading = ref(false)
 
-const recentActivities = [
-  {
-    date: '2026年4月15日',
-    content: '完成腾讯暑期实习申请，投递产品运营岗位',
-    type: 'experience',
-  },
-  {
-    date: '2026年4月10日',
-    content: '获得全国大学生数学建模竞赛省级一等奖',
-    type: 'achievement',
-  },
-  {
-    date: '2026年3月28日',
-    content: '担任学院迎新晚会策划组负责人',
-    type: 'role',
-  },
-  {
-    date: '2026年3月20日',
-    content: '加入"校园植物识别"科研项目组',
-    type: 'experience',
-  },
-]
+const dashboardData = ref({
+  cumulativeGpa: 0,
+  gpaTrend: '0',
+  totalCredits: 0,
+  currentCredits: 0,
+  experienceCount: 0,
+  experienceBreakdown: {},
+  achievementCount: 0,
+  achievementBreakdown: {},
+  roleCount: 0,
+  recentActivities: [],
+  gpaHistory: [],
+  aiSummary: '',
+})
+
+const gpaHistory = computed(() => {
+  return (dashboardData.value.gpaHistory || []).map((item) => ({
+    semester: item.semester,
+    gpa: item.gpa,
+    height: Math.round((item.gpa / 4.0) * 100),
+    current: false,
+  }))
+})
+
+const recentActivities = computed(() => dashboardData.value.recentActivities || [])
 
 function goTo(path) {
   router.push(path)
 }
+
+function breakdownText(obj) {
+  if (!obj) return ''
+  return Object.entries(obj)
+    .map(([k, v]) => `${k} ${v}`)
+    .join(' · ')
+}
+
+async function fetchDashboard() {
+  loading.value = true
+  try {
+    const res = await request.get('/dashboard')
+    if (res) {
+      dashboardData.value = { ...dashboardData.value, ...res }
+    }
+  } catch (error) {
+    console.error(error)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchDashboard()
+})
 </script>
 
 <template>
@@ -57,8 +79,8 @@ function goTo(path) {
           欢迎回来，<em>{{ username }}</em>
         </h1>
         <p class="welcome-sub">
-          你已经记录了 <strong>4</strong> 个学期的成长轨迹，累计获得
-          <strong>86</strong> 学分、<strong>8</strong> 项成就
+          你已经记录了 <strong>{{ gpaHistory.length }}</strong> 个学期的成长轨迹，累计获得
+          <strong>{{ dashboardData.totalCredits }}</strong> 学分、<strong>{{ dashboardData.achievementCount }}</strong> 项成就
         </p>
       </div>
       <div class="welcome-date">
@@ -76,10 +98,12 @@ function goTo(path) {
             <span class="metric-icon" aria-hidden="true">📊</span>
             <span class="metric-label">累计 GPA</span>
           </div>
-          <div class="metric-value tabular">3.72</div>
-          <div class="metric-trend">↑ 0.15 较上学期</div>
+          <div class="metric-value tabular">{{ dashboardData.cumulativeGpa.toFixed(2) }}</div>
+          <div class="metric-trend">
+            {{ dashboardData.gpaTrend && dashboardData.gpaTrend !== '0' ? `↑ ${dashboardData.gpaTrend} 较上学期` : '' }}
+          </div>
         </div>
-        <div class="mini-chart" aria-hidden="true">
+        <div v-if="gpaHistory.length" class="mini-chart" aria-hidden="true">
           <div
             v-for="item in gpaHistory"
             :key="item.semester"
@@ -98,8 +122,8 @@ function goTo(path) {
           <span class="metric-icon" aria-hidden="true">📚</span>
           <span class="metric-label">总学分</span>
         </div>
-        <div class="metric-value tabular">86</div>
-        <div class="metric-sub">本学期已修 18 学分</div>
+        <div class="metric-value tabular">{{ dashboardData.totalCredits }}</div>
+        <div class="metric-sub">本学期已修 {{ dashboardData.currentCredits }} 学分</div>
       </article>
 
       <!-- Experiences -->
@@ -108,8 +132,8 @@ function goTo(path) {
           <span class="metric-icon" aria-hidden="true">🚀</span>
           <span class="metric-label">经历</span>
         </div>
-        <div class="metric-value tabular">12</div>
-        <div class="metric-sub">竞赛 4 · 项目 5 · 实习 3</div>
+        <div class="metric-value tabular">{{ dashboardData.experienceCount }}</div>
+        <div class="metric-sub">{{ breakdownText(dashboardData.experienceBreakdown) }}</div>
       </article>
 
       <!-- Achievements -->
@@ -118,8 +142,8 @@ function goTo(path) {
           <span class="metric-icon" aria-hidden="true">🏆</span>
           <span class="metric-label">成就</span>
         </div>
-        <div class="metric-value tabular">8</div>
-        <div class="metric-sub">国家级 2 · 省级 3 · 校级 3</div>
+        <div class="metric-value tabular">{{ dashboardData.achievementCount }}</div>
+        <div class="metric-sub">{{ breakdownText(dashboardData.achievementBreakdown) }}</div>
       </article>
 
       <!-- Roles -->
@@ -128,8 +152,8 @@ function goTo(path) {
           <span class="metric-icon" aria-hidden="true">🎯</span>
           <span class="metric-label">角色</span>
         </div>
-        <div class="metric-value tabular">5</div>
-        <div class="metric-sub">班级代表 · 社团部长 · 志愿者</div>
+        <div class="metric-value tabular">{{ dashboardData.roleCount }}</div>
+        <div class="metric-sub">担任的职务与角色</div>
       </article>
     </section>
 
@@ -144,7 +168,7 @@ function goTo(path) {
             <a class="section-link" @click="goTo('/courses')">查看详情 →</a>
           </div>
           <div class="chart-container">
-            <div class="chart-bars" role="img" aria-label="各学期 GPA 柱状图">
+            <div v-if="gpaHistory.length" class="chart-bars" role="img" aria-label="各学期 GPA 柱状图">
               <div v-for="item in gpaHistory" :key="item.semester" class="chart-bar-group">
                 <div
                   class="chart-bar"
@@ -158,6 +182,7 @@ function goTo(path) {
                 </span>
               </div>
             </div>
+            <div v-else class="empty-chart">暂无 GPA 数据</div>
           </div>
         </section>
 
@@ -167,7 +192,7 @@ function goTo(path) {
             <h2 class="section-title">最近动态</h2>
             <a class="section-link" @click="goTo('/experiences')">查看全部 →</a>
           </div>
-          <div class="timeline">
+          <div v-if="recentActivities.length" class="timeline">
             <div
               v-for="(item, index) in recentActivities"
               :key="index"
@@ -181,6 +206,7 @@ function goTo(path) {
               </span>
             </div>
           </div>
+          <div v-else class="empty-timeline">暂无动态</div>
         </section>
       </div>
 
@@ -193,7 +219,7 @@ function goTo(path) {
             <h2 class="ai-title">AI 发展分析</h2>
           </div>
           <p class="ai-summary">
-            基于你的经历数据，AI 分析发现你在<strong>数据分析</strong>和<strong>团队协作</strong>方面表现突出。建议下一步重点提升技术深度，考虑补充算法相关课程...
+            {{ dashboardData.aiSummary || 'AI 分析报告暂未生成，快去录入你的课程、经历和成就数据吧！' }}
           </p>
           <button class="ai-btn" @click="goTo('/ai-analysis')">
             查看完整报告 →
@@ -512,6 +538,14 @@ function goTo(path) {
 .chart-bar-label.is-current {
   color: oklch(25% 0.02 30);
   font-weight: 500;
+}
+
+.empty-chart,
+.empty-timeline {
+  text-align: center;
+  padding: 2rem;
+  color: oklch(62% 0.02 30);
+  font-size: 0.875rem;
 }
 
 /* Timeline */

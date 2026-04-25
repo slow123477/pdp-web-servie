@@ -51,90 +51,6 @@ const semesterOptions = [
 
 const typeOptions = ['必修', '选修', '通识']
 
-// Mock 数据
-const mockData = [
-  {
-    id: 1,
-    courseName: '数据结构与算法',
-    courseType: '必修',
-    credits: 4.0,
-    semester: '2024-2025-2',
-    academicYear: '2024-2025',
-    score: 92.0,
-    gradePoint: 4.0,
-  },
-  {
-    id: 2,
-    courseName: '机器学习导论',
-    courseType: '选修',
-    credits: 3.0,
-    semester: '2024-2025-2',
-    academicYear: '2024-2025',
-    score: 88.0,
-    gradePoint: 3.7,
-  },
-  {
-    id: 3,
-    courseName: '软件工程实践',
-    courseType: '必修',
-    credits: 3.0,
-    semester: '2024-2025-2',
-    academicYear: '2024-2025',
-    score: 95.0,
-    gradePoint: 4.0,
-  },
-  {
-    id: 4,
-    courseName: '大学英语（四）',
-    courseType: '通识',
-    credits: 2.0,
-    semester: '2024-2025-2',
-    academicYear: '2024-2025',
-    score: 85.0,
-    gradePoint: 3.3,
-  },
-  {
-    id: 5,
-    courseName: '计算机网络',
-    courseType: '必修',
-    credits: 3.0,
-    semester: '2024-2025-1',
-    academicYear: '2024-2025',
-    score: 90.0,
-    gradePoint: 4.0,
-  },
-  {
-    id: 6,
-    courseName: '操作系统原理',
-    courseType: '必修',
-    credits: 4.0,
-    semester: '2024-2025-1',
-    academicYear: '2024-2025',
-    score: 87.0,
-    gradePoint: 3.7,
-  },
-  {
-    id: 7,
-    courseName: '数据库系统',
-    courseType: '必修',
-    credits: 3.0,
-    semester: '2023-2024-2',
-    academicYear: '2023-2024',
-    score: 91.0,
-    gradePoint: 4.0,
-  },
-  {
-    id: 8,
-    courseName: 'Web 前端开发',
-    courseType: '选修',
-    credits: 2.0,
-    semester: '2023-2024-2',
-    academicYear: '2023-2024',
-    score: 94.0,
-    gradePoint: 4.0,
-  },
-]
-
 // 课程列表和分页由后端处理
 
 function fetchList() {
@@ -209,50 +125,58 @@ function handleSubmit() {
   })
 }
 
-function handleAdd() {
-  request.post('/courses', {
-    courseName: form.courseName,
-    courseType: form.courseType,
-    credits: form.credits,
-    semester: form.semester,
-    academicYear: form.academicYear,
-    score: form.score,
-    gradePoint: form.gradePoint,
-  }).then(() => {
+async function handleAdd() {
+  try {
+    await request.post('/courses', {
+      courseName: form.courseName,
+      courseType: form.courseType,
+      credits: form.credits,
+      semester: form.semester,
+      academicYear: form.academicYear,
+      score: form.score,
+      gradePoint: form.gradePoint,
+    })
     ElMessage.success('添加成功')
     dialogVisible.value = false
     fetchList()
-  })
+  } catch (error) {
+    console.error(error)
+  }
 }
 
-function handleUpdate() {
-  request.put('/courses', {
-    id: form.id,
-    courseName: form.courseName,
-    courseType: form.courseType,
-    credits: form.credits,
-    semester: form.semester,
-    academicYear: form.academicYear,
-    score: form.score,
-    gradePoint: form.gradePoint,
-  }).then(() => {
+async function handleUpdate() {
+  try {
+    await request.put('/courses', {
+      id: form.id,
+      courseName: form.courseName,
+      courseType: form.courseType,
+      credits: form.credits,
+      semester: form.semester,
+      academicYear: form.academicYear,
+      score: form.score,
+      gradePoint: form.gradePoint,
+    })
     ElMessage.success('修改成功')
     dialogVisible.value = false
     fetchList()
-  })
+  } catch (error) {
+    console.error(error)
+  }
 }
 
-function handleDelete(row) {
-  ElMessageBox.confirm(`确定要删除课程「${row.courseName}」吗？`, '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
-  }).then(() => {
-    request.delete(`/courses/${row.id}`).then(() => {
-      ElMessage.success('删除成功')
-      fetchList()
+async function handleDelete(row) {
+  try {
+    await ElMessageBox.confirm(`确定要删除课程「${row.courseName}」吗？`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
     })
-  })
+    await request.delete(`/courses/${row.id}`)
+    ElMessage.success('删除成功')
+    fetchList()
+  } catch (error) {
+    if (error !== 'cancel') console.error(error)
+  }
 }
 
 function handlePageChange(page) {

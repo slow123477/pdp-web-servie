@@ -187,80 +187,18 @@ async function handleDelete(row) {
 async function fetchList() {
   loading.value = true
   try {
-    // 后端尚未实现，先用 mock 数据
-    // const res = await request.get('/achievements', { params: { level: filterLevel.value, category: filterCategory.value, page: 1, pageSize: 100 } })
-    // rawList.value = res.rows || []
-
-    rawList.value = [
-      {
-        id: 1,
-        name: '全国大学生数学建模竞赛一等奖',
-        level: '国家级',
-        category: '竞赛',
-        issuer: '中国工业与应用数学学会',
-        awardDate: '2026-04-15',
-        description: '与两位队友合作完成"城市交通拥堵预测"题目，使用 Python + MATLAB 进行数据分析和模型构建。',
-        certificateUrl: '',
-        createdAt: '2026-04-20T10:00:00',
+    const res = await request.get('/achievements', {
+      params: {
+        level: filterLevel.value || undefined,
+        category: filterCategory.value || undefined,
+        page: 1,
+        pageSize: 100,
       },
-      {
-        id: 2,
-        name: 'ACM 程序设计竞赛银牌',
-        level: '省级',
-        category: '竞赛',
-        issuer: '省计算机学会',
-        awardDate: '2025-11-20',
-        description: '代表学校参加省级 ACM 竞赛，获得银牌。',
-        certificateUrl: '',
-        createdAt: '2025-11-25T10:00:00',
-      },
-      {
-        id: 3,
-        name: '优秀大学生奖学金',
-        level: '省级',
-        category: '学术',
-        issuer: '省教育厅',
-        awardDate: '2025-10-10',
-        description: '综合测评排名年级前 5%，获得优秀大学生奖学金。',
-        certificateUrl: '',
-        createdAt: '2025-10-15T10:00:00',
-      },
-      {
-        id: 4,
-        name: '三好学生',
-        level: '校级',
-        category: '学术',
-        issuer: '学校',
-        awardDate: '2025-09-01',
-        description: '德智体美劳全面发展，被评为三好学生。',
-        certificateUrl: '',
-        createdAt: '2025-09-05T10:00:00',
-      },
-      {
-        id: 5,
-        name: '国家励志奖学金',
-        level: '国家级',
-        category: '学术',
-        issuer: '教育部',
-        awardDate: '2025-09-01',
-        description: '品学兼优，家庭经济困难，获得国家励志奖学金。',
-        certificateUrl: '',
-        createdAt: '2025-09-05T10:00:00',
-      },
-      {
-        id: 6,
-        name: '优秀学生干部',
-        level: '校级',
-        category: '其他',
-        issuer: '学校',
-        awardDate: '2025-06-15',
-        description: '担任班级学习委员期间表现突出，被评为优秀学生干部。',
-        certificateUrl: '',
-        createdAt: '2025-06-20T10:00:00',
-      },
-    ]
+    })
+    rawList.value = res.rows || []
   } catch (error) {
     console.error(error)
+    rawList.value = []
   } finally {
     loading.value = false
   }

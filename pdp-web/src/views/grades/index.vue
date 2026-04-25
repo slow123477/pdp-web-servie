@@ -1,21 +1,17 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import request from '@/utils/request'
 
 const router = useRouter()
 
-const courses = ref([
-  { id: 1, courseName: '高等数学 I', courseType: '必修', credits: 4, semester: '2023-2024-1', score: 92, gradePoint: 4.0 },
-  { id: 2, courseName: '大学英语 I', courseType: '必修', credits: 3, semester: '2023-2024-1', score: 88, gradePoint: 3.7 },
-  { id: 3, courseName: '计算机导论', courseType: '必修', credits: 3, semester: '2023-2024-1', score: 95, gradePoint: 4.0 },
-  { id: 4, courseName: '线性代数', courseType: '必修', credits: 3, semester: '2023-2024-2', score: 85, gradePoint: 3.3 },
-  { id: 5, courseName: '大学物理', courseType: '必修', credits: 4, semester: '2023-2024-2', score: 78, gradePoint: 3.0 },
-  { id: 6, courseName: '数据结构', courseType: '必修', credits: 4, semester: '2024-2025-1', score: 90, gradePoint: 4.0 },
-  { id: 7, courseName: '概率论与数理统计', courseType: '必修', credits: 3, semester: '2024-2025-1', score: 87, gradePoint: 3.7 },
-  { id: 8, courseName: 'Web 前端开发', courseType: '选修', credits: 2, semester: '2024-2025-2', score: 96, gradePoint: 4.0 },
-  { id: 9, courseName: '软件工程', courseType: '必修', credits: 3, semester: '2024-2025-2', score: 89, gradePoint: 3.7 },
-  { id: 10, courseName: '人工智能导论', courseType: '选修', credits: 2, semester: '2024-2025-2', score: 91, gradePoint: 4.0 },
-])
+const courses = ref([])
+const gpaData = ref({
+  cumulativeGpa: 0,
+  totalCredits: 0,
+  semesterGpas: [],
+})
+const loading = ref(false)
 
 const totalCredits = computed(() => courses.value.reduce((sum, c) => sum + c.credits, 0))
 const totalCourses = computed(() => courses.value.length)
@@ -81,6 +77,28 @@ function scoreLabel(score) {
   if (score >= 60) return '及格'
   return '不及格'
 }
+
+async function fetchData() {
+  loading.value = true
+  try {
+    const [coursesRes, gpaRes] = await Promise.all([
+      request.get('/courses', { params: { page: 1, pageSize: 1000 } }),
+      request.get('/gpa').catch(() => null),
+    ])
+    courses.value = coursesRes.rows || []
+    if (gpaRes) {
+      gpaData.value = { ...gpaData.value, ...gpaRes }
+    }
+  } catch (error) {
+    console.error(error)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchData()
+})
 </script>
 
 <template>
@@ -107,7 +125,7 @@ function scoreLabel(score) {
           <div class="metric-value tabular">{{ weightedGpa }}</div>
           <div class="metric-sub">满分 4.0</div>
         </div>
-        <div class="mini-chart" aria-hidden="true">
+        <div v-if="gpaTrend.length" class="mini-chart" aria-hidden="true">
           <div
             v-for="item in gpaTrend"
             :key="item.semester"
@@ -168,7 +186,7 @@ function scoreLabel(score) {
             <span class="section-desc">各学期加权 GPA 变化</span>
           </div>
           <div class="chart-container">
-            <div class="chart-bars" role="img" aria-label="各学期 GPA 柱状图">
+            <div v-if="gpaTrend.length" class="chart-bars" role="img" aria-label="各学期 GPA 柱状图">
               <div v-for="item in gpaTrend" :key="item.semester" class="chart-bar-group">
                 <div
                   class="chart-bar"
@@ -182,6 +200,7 @@ function scoreLabel(score) {
                 </span>
               </div>
             </div>
+            <div v-else class="empty-chart">暂无 GPA 数据</div>
           </div>
         </section>
 
@@ -191,7 +210,7 @@ function scoreLabel(score) {
             <h2 class="section-title">成绩明细</h2>
             <span class="section-desc">全部课程成绩记录</span>
           </div>
-          <div class="grade-list">
+          <div v-if="courses.length" class="grade-list">
             <div v-for="c in courses" :key="c.id" class="grade-item">
               <div class="grade-main">
                 <span class="grade-type-tag" :class="c.courseType">{{ c.courseType }}</span>
@@ -214,6 +233,7 @@ function scoreLabel(score) {
               </div>
             </div>
           </div>
+          <div v-else class="empty-list">暂无课程数据</div>
         </section>
       </div>
 
@@ -221,7 +241,7 @@ function scoreLabel(score) {
       <aside class="content-side">
         <div class="section-card">
           <h3 class="side-title">学期统计</h3>
-          <div class="semester-list">
+          <div v-if="semesterStats.length" class="semester-list">
             <div v-for="s in semesterStats" :key="s.semester" class="semester-item">
               <div class="semester-name">{{ s.semester }}</div>
               <div class="semester-meta">
@@ -233,6 +253,7 @@ function scoreLabel(score) {
               </div>
             </div>
           </div>
+          <div v-else class="empty-side">暂无学期统计</div>
         </div>
 
         <div class="quick-actions">
@@ -513,6 +534,15 @@ function scoreLabel(score) {
 .chart-bar-label.is-current {
   color: oklch(25% 0.02 30);
   font-weight: 500;
+}
+
+.empty-chart,
+.empty-list,
+.empty-side {
+  text-align: center;
+  padding: 2rem;
+  color: oklch(62% 0.02 30);
+  font-size: 0.875rem;
 }
 
 /* Grade List */

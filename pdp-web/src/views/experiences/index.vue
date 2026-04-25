@@ -193,69 +193,17 @@ async function handleDelete(row) {
 async function fetchList() {
   loading.value = true
   try {
-    // 后端尚未实现，先用 mock 数据
-    // const res = await request.get('/experiences', { params: { type: filterType.value, page: 1, pageSize: 100 } })
-    // rawList.value = res.rows || []
-
-    rawList.value = [
-      {
-        id: 1,
-        title: '腾讯暑期实习申请',
-        type: '实习',
-        startDate: '2026-04-01',
-        endDate: '2026-07-01',
-        description: '投递产品运营岗位，已完成笔试和初面，等待二面结果。准备了产品分析报告和过往项目作品集。',
-        result: '',
-        attachments: [],
-        createdAt: '2026-04-10T10:00:00',
+    const res = await request.get('/experiences', {
+      params: {
+        type: filterType.value || undefined,
+        page: 1,
+        pageSize: 100,
       },
-      {
-        id: 2,
-        title: '全国大学生数学建模竞赛',
-        type: '竞赛',
-        startDate: '2026-03-01',
-        endDate: '2026-03-15',
-        description: '与两位队友合作完成"城市交通拥堵预测"题目，使用 Python + MATLAB 进行数据分析和模型构建，获省级一等奖。',
-        result: '省级一等奖',
-        attachments: [],
-        createdAt: '2026-03-20T10:00:00',
-      },
-      {
-        id: 3,
-        title: '校园植物识别科研项目',
-        type: '项目',
-        startDate: '2026-03-01',
-        endDate: '2026-06-30',
-        description: '加入计算机学院课题组，负责图像识别模块开发，使用 PyTorch 训练 ResNet 模型，准确率达到 92%。',
-        result: '优秀结题',
-        attachments: [],
-        createdAt: '2026-07-01T10:00:00',
-      },
-      {
-        id: 4,
-        title: 'ACM 程序设计竞赛（区域赛）',
-        type: '竞赛',
-        startDate: '2025-11-01',
-        endDate: '2025-11-03',
-        description: '代表学校参加 ACM-ICPC 亚洲区域赛，团队获得铜牌。主要负责图论和动态规划类题目。',
-        result: '铜牌',
-        attachments: [],
-        createdAt: '2025-11-10T10:00:00',
-      },
-      {
-        id: 5,
-        title: '学生选课系统重构',
-        type: '项目',
-        startDate: '2025-09-01',
-        endDate: '2025-12-30',
-        description: '课程大作业，使用 Spring Boot + Vue 重构学校旧版选课系统，实现了并发选课的乐观锁机制。',
-        result: '优秀毕业设计',
-        attachments: [],
-        createdAt: '2026-01-05T10:00:00',
-      },
-    ]
+    })
+    rawList.value = res.rows || []
   } catch (error) {
     console.error(error)
+    rawList.value = []
   } finally {
     loading.value = false
   }

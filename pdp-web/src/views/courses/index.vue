@@ -210,8 +210,15 @@ function handleSubmit() {
 }
 
 function handleAdd() {
-  const { id, ...payload } = form
-  request.post('/courses', payload).then(() => {
+  request.post('/courses', {
+    courseName: form.courseName,
+    courseType: form.courseType,
+    credits: form.credits,
+    semester: form.semester,
+    academicYear: form.academicYear,
+    score: form.score,
+    gradePoint: form.gradePoint,
+  }).then(() => {
     ElMessage.success('添加成功')
     dialogVisible.value = false
     fetchList()
@@ -219,7 +226,16 @@ function handleAdd() {
 }
 
 function handleUpdate() {
-  request.put('/courses', form).then(() => {
+  request.put('/courses', {
+    id: form.id,
+    courseName: form.courseName,
+    courseType: form.courseType,
+    credits: form.credits,
+    semester: form.semester,
+    academicYear: form.academicYear,
+    score: form.score,
+    gradePoint: form.gradePoint,
+  }).then(() => {
     ElMessage.success('修改成功')
     dialogVisible.value = false
     fetchList()

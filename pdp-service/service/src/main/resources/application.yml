@@ -27,6 +27,10 @@ pagehelper:
   support-methods-arguments: true
   params: count=countSql
 
+app:
+  upload:
+    path: ${user.dir}/service/src/main/resources/static/upload
+
 logging:
   level:
     com.slow: debug

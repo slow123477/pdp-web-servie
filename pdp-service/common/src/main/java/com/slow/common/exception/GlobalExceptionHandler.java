@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
@@ -35,6 +36,12 @@ public class GlobalExceptionHandler {
                 .findFirst()
                 .orElse("参数校验失败");
         return Result.error(message);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public Result<String> maxUploadSizeExceededExceptionHandler(MaxUploadSizeExceededException ex) {
+        log.warn("文件过大: {}", ex.getMessage());
+        return Result.error("文件大小超过限制（最大10MB）");
     }
 
     @ExceptionHandler(Exception.class)

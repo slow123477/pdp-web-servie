@@ -10,6 +10,7 @@ import com.slow.service.mapper.UserMapper;
 import com.slow.service.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -109,6 +110,9 @@ public class UserServiceImpl implements UserService {
         userMapper.update(updateUser);
     }
 
+    @Value("${app.upload.path:${user.dir}/uploads}")
+    private String uploadPath;
+
     @Override
     public String uploadAvatar(Long userId, MultipartFile file) {
         if (file.isEmpty()) {
@@ -125,8 +129,7 @@ public class UserServiceImpl implements UserService {
         String filename = UUID.randomUUID().toString().replace("-", "") + "." + ext;
 
         try {
-            String basePath = System.getProperty("user.dir");
-            Path avatarDir = Paths.get(basePath, "target", "classes", "static", "upload", "avatar");
+            Path avatarDir = Paths.get(uploadPath, "avatar");
             Files.createDirectories(avatarDir);
             Path targetPath = avatarDir.resolve(filename);
             file.transferTo(targetPath.toFile());

@@ -54,6 +54,7 @@ pdp-web/*.timestamp-*-*.mjs
 # Backend (pdp-service)
 # ====================
 pdp-service/**/target/
+pdp-service/service/src/main/resources/static/upload/
 pdp-service/.idea/
 pdp-service/*.iml
 pdp-service/.classpath

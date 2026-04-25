@@ -71,8 +71,14 @@ function handleLogout() {
       </div>
       <div class="nav-user">
         <span class="user-name">{{ userStore.userInfo?.username || '用户' }}</span>
-        <el-dropdown @command="handleCommand">
-          <div class="user-avatar" aria-label="用户头像">{{ userInitial }}</div>
+        <el-dropdown @command="handleCommand" trigger="click">
+          <img
+            v-if="userStore.userInfo?.avatar"
+            :src="userStore.userInfo.avatar"
+            class="user-avatar"
+            alt="头像"
+          />
+          <div v-else class="user-avatar" aria-label="用户头像">{{ userInitial }}</div>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item command="profile">个人中心</el-dropdown-item>

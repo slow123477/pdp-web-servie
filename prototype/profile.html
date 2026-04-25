@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>个人中心 - 成长规划</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-display: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Georgia', serif;
+      --font-body: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+      --text-xs: 0.75rem; --text-sm: 0.875rem; --text-base: 1rem;
+      --text-lg: 1.25rem; --text-xl: 1.5rem; --text-2xl: 2rem;
+      --space-xs: 0.25rem; --space-sm: 0.5rem; --space-md: 0.75rem;
+      --space-lg: 1rem; --space-xl: 1.5rem; --space-2xl: 2rem; --space-3xl: 3rem;
+      --bg-base: oklch(98% 0.008 30);
+      --bg-surface: oklch(96% 0.012 30);
+      --bg-surface-hover: oklch(94% 0.015 30);
+      --border-subtle: oklch(88% 0.015 30);
+      --text-primary: oklch(25% 0.02 30);
+      --text-secondary: oklch(48% 0.025 30);
+      --text-tertiary: oklch(62% 0.02 30);
+      --color-primary: oklch(70% 0.14 20);
+      --color-primary-deep: oklch(58% 0.16 20);
+      --color-primary-light: oklch(85% 0.08 20);
+      --color-primary-bg: oklch(96% 0.02 20);
+      --radius-sm: 6px; --radius-md: 10px; --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px oklch(70% 0.01 30 / 0.06);
+      --shadow-md: 0 4px 12px oklch(70% 0.01 30 / 0.08);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-body); font-size: var(--text-base); line-height: 1.6; color: var(--text-primary); background: var(--bg-base); }
+    h1, h2, h3 { font-family: var(--font-display); font-weight: 400; line-height: 1.25; }
+
+    /* Nav */
+    .top-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-md) var(--space-2xl);
+      background: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); position: sticky; top: 0; z-index: 100;
+    }
+    .nav-brand { display: flex; align-items: center; gap: var(--space-sm); }
+    .nav-logo { font-size: var(--text-xl); }
+    .nav-title { font-family: var(--font-display); font-size: var(--text-lg); }
+    .nav-links { display: flex; gap: var(--space-xs); }
+    .nav-link { padding: var(--space-sm) var(--space-md); border-radius: var(--radius-sm); font-size: var(--text-sm); color: var(--text-secondary); transition: all 0.2s; }
+    .nav-link:hover { color: var(--text-primary); background: var(--bg-base); }
+    .nav-link.is-active { color: var(--color-primary-deep); background: var(--color-primary-bg); }
+    .nav-user { display: flex; align-items: center; gap: var(--space-md); }
+    .user-name { font-size: var(--text-sm); color: var(--text-secondary); }
+    .user-avatar {
+      width: 36px; height: 36px; border-radius: 50%; background: var(--color-primary-light);
+      color: var(--color-primary-deep); display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display); font-size: var(--text-sm); border: 2px solid var(--bg-base);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .user-avatar:hover { box-shadow: 0 0 0 3px oklch(85% 0.08 20 / 0.3); }
+
+    /* Page */
+    .page { max-width: 960px; margin: 0 auto; padding: var(--space-3xl) var(--space-2xl); }
+    .page-title { font-size: var(--text-2xl); margin-bottom: var(--space-xl); }
+
+    /* Profile Grid */
+    .profile-grid { display: grid; grid-template-columns: 280px 1fr; gap: var(--space-xl); align-items: start; }
+
+    /* Sidebar Avatar Card */
+    .avatar-card {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg);
+      padding: var(--space-2xl); text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--space-md);
+    }
+    .avatar-large {
+      width: 96px; height: 96px; border-radius: 50%; background: var(--color-primary-light); color: var(--color-primary-deep);
+      display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: var(--text-xl);
+      border: 3px solid var(--bg-base); box-shadow: var(--shadow-sm);
+    }
+    .avatar-name { font-family: var(--font-display); font-size: var(--text-lg); color: var(--text-primary); margin-top: var(--space-sm); }
+    .avatar-email { font-size: var(--text-sm); color: var(--text-tertiary); word-break: break-all; }
+    .btn-change-avatar {
+      margin-top: var(--space-sm); padding: var(--space-sm) var(--space-lg); background: transparent; color: var(--color-primary);
+      border: 1px solid var(--border-subtle); border-radius: var(--radius-md); font-size: var(--text-sm); font-family: inherit;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-change-avatar:hover { background: var(--color-primary-bg); border-color: var(--color-primary); }
+
+    /* Main Cards */
+    .settings-card {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: var(--space-xl); margin-bottom: var(--space-xl);
+    }
+    .settings-card-title { font-size: var(--text-lg); margin-bottom: var(--space-lg); }
+    .form-group { margin-bottom: var(--space-lg); }
+    .form-group label { display: block; font-size: var(--text-sm); font-weight: 500; color: var(--text-primary); margin-bottom: var(--space-sm); }
+    .form-group input {
+      width: 100%; padding: var(--space-sm) var(--space-md); border: 1px solid var(--border-subtle); border-radius: var(--radius-md);
+      font-family: inherit; font-size: var(--text-sm); color: var(--text-primary); background: var(--bg-base); transition: all 0.2s;
+    }
+    .form-group input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px oklch(85% 0.08 20 / 0.3); }
+    .form-group input::placeholder { color: var(--text-tertiary); }
+    .form-hint { font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-xs); }
+
+    .btn-save {
+      padding: var(--space-sm) var(--space-xl); background: var(--color-primary); color: white;
+      border: none; border-radius: var(--radius-md); font-size: var(--text-sm); font-weight: 500;
+      font-family: inherit; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-save:hover { background: var(--color-primary-deep); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+
+    .btn-text {
+      padding: var(--space-sm) var(--space-md); background: transparent; color: var(--text-secondary);
+      border: none; font-size: var(--text-sm); font-family: inherit; cursor: pointer; transition: color 0.2s;
+    }
+    .btn-text:hover { color: var(--color-primary); text-decoration: underline; }
+
+    /* Danger zone */
+    .danger-zone { border-color: oklch(80% 0.1 25); }
+    .danger-zone .settings-card-title { color: oklch(55% 0.18 25); }
+    .btn-danger {
+      padding: var(--space-sm) var(--space-md); background: transparent; color: oklch(55% 0.18 25);
+      border: 1px solid oklch(80% 0.1 25); border-radius: var(--radius-md); font-size: var(--text-sm);
+      font-family: inherit; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-danger:hover { background: oklch(95% 0.03 25); }
+
+    @media (max-width: 768px) {
+      .page { padding: var(--space-xl) var(--space-lg); }
+      .profile-grid { grid-template-columns: 1fr; }
+      .avatar-card { flex-direction: row; text-align: left; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-nav">
+    <div class="nav-brand"><span class="nav-logo">🌱</span><span class="nav-title">成长规划</span></div>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">首页</a>
+      <a href="courses.html" class="nav-link">课程</a>
+      <a href="experiences.html" class="nav-link">经历</a>
+      <a href="achievements.html" class="nav-link">成就</a>
+      <a href="roles.html" class="nav-link">角色</a>
+      <a href="ai-analysis.html" class="nav-link">AI分析</a>
+    </div>
+    <div class="nav-user">
+      <span class="user-name">小明</span>
+      <a href="settings.html"><div class="user-avatar">明</div></a>
+    </div>
+  </nav>
+
+  <main class="page">
+    <h1 class="page-title">个人中心</h1>
+
+    <div class="profile-grid">
+      <!-- Sidebar: Avatar -->
+      <aside class="profile-sidebar">
+        <div class="avatar-card">
+          <div class="avatar-large">明</div>
+          <div class="avatar-name">小明</div>
+          <div class="avatar-email">xiaoming@example.edu.cn</div>
+          <button class="btn-change-avatar">更换头像</button>
+        </div>
+      </aside>
+
+      <!-- Main: Forms -->
+      <div class="profile-main">
+        <div class="settings-card">
+          <h2 class="settings-card-title">基本信息</h2>
+          <div class="form-group">
+            <label for="profile-username">用户名</label>
+            <input id="profile-username" type="text" value="xiaoming" />
+          </div>
+          <div class="form-group">
+            <label for="profile-realname">真实姓名</label>
+            <input id="profile-realname" type="text" value="小明" />
+          </div>
+          <div class="form-group">
+            <label for="profile-student-id">学号</label>
+            <input id="profile-student-id" type="text" value="2023010001" />
+          </div>
+          <div class="form-group">
+            <label for="profile-email">邮箱</label>
+            <input id="profile-email" type="text" value="xiaoming@example.edu.cn" />
+          </div>
+          <div class="form-group">
+            <label for="profile-major">专业</label>
+            <input id="profile-major" type="text" value="计算机科学与技术" />
+          </div>
+          <div class="form-group">
+            <label for="profile-grade">年级</label>
+            <select id="profile-grade" style="width: 100%; padding: var(--space-sm) var(--space-md); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); font-family: inherit; font-size: var(--text-sm); color: var(--text-primary); background: var(--bg-base);">
+              <option value="1">大一</option>
+              <option value="2" selected>大二</option>
+              <option value="3">大三</option>
+              <option value="4">大四</option>
+            </select>
+          </div>
+          <button class="btn-save">保存修改</button>
+        </div>
+
+        <div class="settings-card">
+          <h2 class="settings-card-title">修改密码</h2>
+          <div class="form-group">
+            <label for="profile-old-pwd">当前密码</label>
+            <input id="profile-old-pwd" type="password" placeholder="请输入当前密码" />
+          </div>
+          <div class="form-group">
+            <label for="profile-new-pwd">新密码</label>
+            <input id="profile-new-pwd" type="password" placeholder="设置新密码（至少6位）" />
+          </div>
+          <div class="form-group">
+            <label for="profile-confirm-pwd">确认新密码</label>
+            <input id="profile-confirm-pwd" type="password" placeholder="再次输入新密码" />
+          </div>
+          <button class="btn-save">更新密码</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

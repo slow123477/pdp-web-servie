@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.slow.service.mapper.AchievementMapper">
+
+    <resultMap id="BaseResultMap" type="com.slow.pojo.entity.Achievement">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="name" property="name"/>
+        <result column="level" property="level"/>
+        <result column="category" property="category"/>
+        <result column="issuer" property="issuer"/>
+        <result column="award_date" property="awardDate"/>
+        <result column="description" property="description"/>
+        <result column="certificate_url" property="certificateUrl"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, name, level, category, issuer, award_date, description, certificate_url, created_at, updated_at
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM achievements
+        <where>
+            user_id = #{userId}
+            <if test="level != null and level != ''">
+                AND level = #{level}
+            </if>
+            <if test="category != null and category != ''">
+                AND category = #{category}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM achievements
+        WHERE id = #{id} AND user_id = #{userId}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO achievements (user_id, name, level, category, issuer, award_date, description, certificate_url)
+        VALUES (#{userId}, #{name}, #{level}, #{category}, #{issuer}, #{awardDate}, #{description}, #{certificateUrl})
+    </insert>
+
+    <update id="update">
+        UPDATE achievements
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="level != null">level = #{level},</if>
+            <if test="category != null">category = #{category},</if>
+            <if test="issuer != null">issuer = #{issuer},</if>
+            <if test="awardDate != null">award_date = #{awardDate},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="certificateUrl != null">certificate_url = #{certificateUrl}</if>
+        </set>
+        WHERE id = #{id} AND user_id = #{userId}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM achievements WHERE id = #{id} AND user_id = #{userId}
+    </delete>
+
+</mapper>

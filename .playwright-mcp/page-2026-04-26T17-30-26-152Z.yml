@@ -1,0 +1,420 @@
+- generic [ref=e4]:
+  - complementary [ref=e5]:
+    - generic [ref=e6]:
+      - combobox [ref=e25] [cursor=pointer]:
+        - generic "default" [ref=e27]
+        - 'generic "icon: down" [ref=e29]':
+          - img [ref=e30]
+      - menu [ref=e8]:
+        - menuitem "主页" [ref=e32] [cursor=pointer]:
+          - link "主页" [ref=e33]:
+            - /url: "#/home"
+            - img [ref=e35]
+            - text: 主页
+        - menuitem "Authorize" [ref=e37] [cursor=pointer]:
+          - link "Authorize" [ref=e38]:
+            - /url: "#/Authorize/default"
+            - img [ref=e40]
+            - text: Authorize
+        - menuitem "Swagger Models" [ref=e42] [cursor=pointer]:
+          - link "Swagger Models" [ref=e43]:
+            - /url: "#/SwaggerModels/default"
+            - img [ref=e45]
+            - text: Swagger Models
+        - menuitem "文档管理" [ref=e47]:
+          - generic [ref=e49] [cursor=pointer]:
+            - img [ref=e51]
+            - text: 文档管理
+        - menuitem "5 课程管理" [ref=e53]:
+          - generic [ref=e55] [cursor=pointer]:
+            - img [ref=e57]
+            - generic [ref=e59]: "5"
+            - text: 课程管理
+        - menuitem "4 用户模块" [ref=e60]:
+          - generic [ref=e62] [cursor=pointer]:
+            - img [ref=e64]
+            - generic [ref=e66]: "4"
+            - text: 用户模块
+        - menuitem "1 文件上传" [ref=e67]:
+          - generic [ref=e69] [cursor=pointer]:
+            - img [ref=e71]
+            - generic [ref=e73]: "1"
+            - text: 文件上传
+        - menuitem "2 设置管理" [ref=e74]:
+          - generic [ref=e76] [cursor=pointer]:
+            - img [ref=e78]
+            - generic [ref=e80]: "2"
+            - text: 设置管理
+        - menuitem "5 成就管理" [ref=e81]:
+          - generic [ref=e83] [cursor=pointer]:
+            - img [ref=e85]
+            - generic [ref=e87]: "5"
+            - text: 成就管理
+        - menuitem "3 认证模块" [ref=e88]:
+          - generic [ref=e90] [cursor=pointer]:
+            - img [ref=e92]
+            - generic [ref=e94]: "3"
+            - text: 认证模块
+          - menu [ref=e212]:
+            - menuitem "POST 用户注册" [ref=e203] [cursor=pointer]:
+              - link "POST 用户注册" [ref=e204]:
+                - /url: "#/default/认证模块/register"
+                - generic [ref=e205]: POST
+                - text: 用户注册
+            - menuitem "POST 用户登录" [ref=e206] [cursor=pointer]:
+              - link "POST 用户登录" [active] [ref=e207]:
+                - /url: "#/default/认证模块/login"
+                - generic [ref=e208]: POST
+                - text: 用户登录
+            - menuitem "GET 获取当前登录用户" [ref=e209] [cursor=pointer]:
+              - link "GET 获取当前登录用户" [ref=e210]:
+                - /url: "#/default/认证模块/getCurrentUser"
+                - generic [ref=e211]: GET
+                - text: 获取当前登录用户
+        - menuitem "5 经历管理" [ref=e95]:
+          - generic [ref=e97] [cursor=pointer]:
+            - img [ref=e99]
+            - generic [ref=e101]: "5"
+            - text: 经历管理
+  - generic [ref=e9]:
+    - generic [ref=e102]:
+      - 'generic "icon: menu-fold" [ref=e11] [cursor=pointer]':
+        - img [ref=e12]
+      - text: 个人发展规划网站 API
+      - generic [ref=e14]:
+        - generic [ref=e103] [cursor=pointer]:
+          - combobox [ref=e105]:
+            - generic [ref=e106]:
+              - list:
+                - listitem [ref=e107]:
+                  - textbox "输入文档关键字搜索" [ref=e109]
+          - 'generic "icon: search" [ref=e110]':
+            - img [ref=e111]
+        - generic [ref=e15] [cursor=pointer]: 中
+    - generic [ref=e16]:
+      - tablist [ref=e17]:
+        - generic [ref=e18]:
+          - generic:
+            - generic:
+              - 'generic "icon: left"':
+                - img
+          - generic:
+            - generic:
+              - 'generic "icon: right"':
+                - img
+          - generic [ref=e114]:
+            - tab "主页" [ref=e115] [cursor=pointer]:
+              - generic [ref=e116]: 主页
+            - 'tab "用户登录 icon: close" [selected] [ref=e213] [cursor=pointer]':
+              - generic [ref=e214]:
+                - text: 用户登录
+                - 'generic "icon: close" [ref=e215]':
+                  - img [ref=e216]
+      - generic [ref=e117]:
+        - main:
+          - generic:
+            - generic:
+              - generic:
+                - heading [level=2]: 个人发展规划网站 API
+              - generic:
+                - generic:
+                  - generic:
+                    - heading [level=3]: 简介
+                  - generic:
+                    - generic:
+                      - paragraph: Personal Development Planning Website 接口文档
+                - separator
+                - generic:
+                  - generic:
+                    - heading [level=3]: 作者
+                  - generic: PDP Team
+                - separator
+                - generic:
+                  - generic:
+                    - heading [level=3]: 版本
+                  - generic: "1.0"
+                - separator
+                - generic:
+                  - generic:
+                    - heading [level=3]: host
+                  - generic: http://localhost:8080
+                - separator
+                - generic:
+                  - generic:
+                    - heading [level=3]: basePath
+                  - generic: /
+                - separator
+                - generic:
+                  - generic:
+                    - heading [level=3]: API服务条款
+                - separator
+                - generic:
+                  - generic:
+                    - heading [level=3]: 分组名称
+                  - generic: default
+                - separator
+                - generic:
+                  - generic:
+                    - heading [level=3]: 分组Url
+                  - generic: /v3/api-docs
+                - separator
+                - generic:
+                  - generic:
+                    - heading [level=3]: 分组location
+                  - generic: /v3/api-docs
+                - separator
+                - generic:
+                  - generic:
+                    - heading [level=3]: 接口统计信息
+                  - generic:
+                    - generic:
+                      - generic: PUT
+                      - generic:
+                        - generic: "6"
+                      - separator
+                    - generic:
+                      - generic: GET
+                      - generic:
+                        - generic: "9"
+                      - separator
+                    - generic:
+                      - generic: POST
+                      - generic:
+                        - generic: "7"
+                      - separator
+                    - generic:
+                      - generic: DELETE
+                      - generic:
+                        - generic: "3"
+                      - separator
+        - tabpanel [ref=e218]:
+          - main [ref=e219]:
+            - generic [ref=e221]:
+              - tablist [ref=e222]:
+                - generic [ref=e223]:
+                  - generic:
+                    - generic:
+                      - 'generic "icon: up"':
+                        - img
+                  - generic:
+                    - generic:
+                      - 'generic "icon: down"':
+                        - img
+                  - generic [ref=e227]:
+                    - tab "文档" [selected] [ref=e228] [cursor=pointer]:
+                      - generic [ref=e229]:
+                        - img [ref=e231]
+                        - text: 文档
+                    - tab "调试" [ref=e233] [cursor=pointer]:
+                      - generic [ref=e234]:
+                        - img [ref=e236]
+                        - text: 调试
+                    - 'tab "icon: file-text Open" [ref=e238] [cursor=pointer]':
+                      - generic [ref=e239]:
+                        - 'generic "icon: file-text" [ref=e240]':
+                          - img [ref=e241]
+                        - text: Open
+                    - 'tab "icon: codepen Script" [ref=e243] [cursor=pointer]':
+                      - generic [ref=e244]:
+                        - 'generic "icon: codepen" [ref=e245]':
+                          - img [ref=e246]
+                        - text: Script
+              - tabpanel [ref=e250]:
+                - generic [ref=e251]:
+                  - generic [ref=e252]:
+                    - generic [ref=e253]:
+                      - generic [ref=e254]: 用户登录
+                      - generic [ref=e255] [cursor=pointer]: 复制接口
+                      - generic [ref=e256] [cursor=pointer]: 复制文档
+                      - generic [ref=e257] [cursor=pointer]: 复制地址
+                    - generic [ref=e259] [cursor=pointer]:
+                      - generic [ref=e260]: POST
+                      - generic [ref=e261]: /auth/login
+                    - generic [ref=e262]:
+                      - generic [ref=e264]:
+                        - generic [ref=e265]: 请求数据类型
+                        - text: application/json
+                      - generic [ref=e267]:
+                        - generic [ref=e268]: 响应数据类型
+                        - text: "[ \"*/*\" ]"
+                  - generic [ref=e269]:
+                    - generic [ref=e270]: 接口描述
+                    - paragraph [ref=e272]: 用户名或邮箱均可登录，登录成功后返回JWT令牌
+                  - generic [ref=e273]:
+                    - generic [ref=e274]: 请求示例
+                    - generic [ref=e276]:
+                      - textbox [ref=e277]
+                      - generic [ref=e279]:
+                        - generic [ref=e280]: "1"
+                        - generic [ref=e282]: "2"
+                        - generic [ref=e283]: "3"
+                        - generic [ref=e284]: "4"
+                      - generic [ref=e287]:
+                        - generic:
+                          - generic: "{"
+                          - generic: "\"username\": \"\","
+                          - generic: "\"password\": \"\""
+                          - generic: "}"
+                  - generic [ref=e288]: 请求参数
+                  - table [ref=e295]:
+                    - rowgroup [ref=e303]:
+                      - row "参数名称 参数说明 请求类型 是否必须 数据类型 schema" [ref=e304]:
+                        - columnheader "参数名称" [ref=e305]:
+                          - generic [ref=e307]: 参数名称
+                        - columnheader "参数说明" [ref=e308]:
+                          - generic [ref=e310]: 参数说明
+                        - columnheader "请求类型" [ref=e311]:
+                          - generic [ref=e313]: 请求类型
+                        - columnheader "是否必须" [ref=e314]:
+                          - generic [ref=e316]: 是否必须
+                        - columnheader "数据类型" [ref=e317]:
+                          - generic [ref=e319]: 数据类型
+                        - columnheader "schema" [ref=e320]:
+                          - generic [ref=e322]: schema
+                    - rowgroup [ref=e323]:
+                      - row "Collapse row userLoginDTO UserLoginDTO body true UserLoginDTO UserLoginDTO" [ref=e324]:
+                        - cell "Collapse row userLoginDTO" [ref=e325]:
+                          - button "Collapse row" [ref=e326] [cursor=pointer]: "-"
+                          - text: userLoginDTO
+                        - cell "UserLoginDTO" [ref=e327]
+                        - cell "body" [ref=e328]
+                        - cell "true" [ref=e329]
+                        - cell "UserLoginDTO" [ref=e330]:
+                          - generic [ref=e331]: UserLoginDTO
+                        - cell "UserLoginDTO" [ref=e332]
+                      - row "username true string" [ref=e333]:
+                        - cell "username" [ref=e334]: username
+                        - cell [ref=e336]
+                        - cell [ref=e337]
+                        - cell "true" [ref=e338]
+                        - cell "string" [ref=e339]:
+                          - generic [ref=e340]: string
+                        - cell [ref=e341]
+                      - row "password true string" [ref=e342]:
+                        - cell "password" [ref=e343]: password
+                        - cell [ref=e345]
+                        - cell [ref=e346]
+                        - cell "true" [ref=e347]
+                        - cell "string" [ref=e348]:
+                          - generic [ref=e349]: string
+                        - cell [ref=e350]
+                  - generic [ref=e351]:
+                    - generic [ref=e352]: 响应状态
+                    - table [ref=e359]:
+                      - rowgroup [ref=e364]:
+                        - row "状态码 说明 schema" [ref=e365]:
+                          - columnheader "状态码" [ref=e366]:
+                            - generic [ref=e368]: 状态码
+                          - columnheader "说明" [ref=e369]:
+                            - generic [ref=e371]: 说明
+                          - columnheader "schema" [ref=e372]:
+                            - generic [ref=e374]: schema
+                      - rowgroup [ref=e375]:
+                        - row "200 OK ResultAuthVO" [ref=e376]:
+                          - cell "200" [ref=e377]
+                          - cell "OK" [ref=e378]:
+                            - generic [ref=e379]: OK
+                          - cell "ResultAuthVO" [ref=e380]
+                        - row "404 Not Found" [ref=e381]:
+                          - cell "404" [ref=e382]
+                          - cell "Not Found" [ref=e383]:
+                            - generic [ref=e384]: Not Found
+                          - cell [ref=e385]
+                  - generic [ref=e386]:
+                    - generic [ref=e387]: 响应参数
+                    - table [ref=e394]:
+                      - rowgroup [ref=e400]:
+                        - row "参数名称 参数说明 类型 schema" [ref=e401]:
+                          - columnheader "参数名称" [ref=e402]:
+                            - generic [ref=e404]: 参数名称
+                          - columnheader "参数说明" [ref=e405]:
+                            - generic [ref=e407]: 参数说明
+                          - columnheader "类型" [ref=e408]:
+                            - generic [ref=e410]: 类型
+                          - columnheader "schema" [ref=e411]:
+                            - generic [ref=e413]: schema
+                      - rowgroup [ref=e414]:
+                        - row "code integer(int32) integer(int32)" [ref=e415]:
+                          - cell "code" [ref=e416]: code
+                          - cell [ref=e417]
+                          - cell "integer(int32)" [ref=e418]
+                          - cell "integer(int32)" [ref=e419]
+                        - row "msg string" [ref=e420]:
+                          - cell "msg" [ref=e421]: msg
+                          - cell [ref=e422]
+                          - cell "string" [ref=e423]
+                          - cell [ref=e424]
+                        - row "Collapse row data AuthVO AuthVO" [ref=e425]:
+                          - cell "Collapse row data" [ref=e426]:
+                            - button "Collapse row" [ref=e427] [cursor=pointer]: "-"
+                            - text: data
+                          - cell [ref=e428]
+                          - cell "AuthVO" [ref=e429]
+                          - cell "AuthVO" [ref=e430]
+                        - row "id integer(int64)" [ref=e431]:
+                          - cell "id" [ref=e432]: id
+                          - cell [ref=e434]
+                          - cell "integer(int64)" [ref=e435]
+                          - cell [ref=e436]
+                        - row "username string" [ref=e437]:
+                          - cell "username" [ref=e438]: username
+                          - cell [ref=e440]
+                          - cell "string" [ref=e441]
+                          - cell [ref=e442]
+                        - row "email string" [ref=e443]:
+                          - cell "email" [ref=e444]: email
+                          - cell [ref=e446]
+                          - cell "string" [ref=e447]
+                          - cell [ref=e448]
+                        - row "realName string" [ref=e449]:
+                          - cell "realName" [ref=e450]: realName
+                          - cell [ref=e452]
+                          - cell "string" [ref=e453]
+                          - cell [ref=e454]
+                        - row "avatar string" [ref=e455]:
+                          - cell "avatar" [ref=e456]: avatar
+                          - cell [ref=e458]
+                          - cell "string" [ref=e459]
+                          - cell [ref=e460]
+                        - row "token string" [ref=e461]:
+                          - cell "token" [ref=e462]: token
+                          - cell [ref=e464]
+                          - cell "string" [ref=e465]
+                          - cell [ref=e466]
+                    - generic [ref=e467]: 响应示例
+                    - generic [ref=e470]:
+                      - textbox [ref=e471]
+                      - generic [ref=e473]:
+                        - generic [ref=e474]: "1"
+                        - generic [ref=e476]: "2"
+                        - generic [ref=e477]: "3"
+                        - generic [ref=e478]: "4"
+                        - generic [ref=e480]: "5"
+                        - generic [ref=e481]: "6"
+                        - generic [ref=e482]: "7"
+                        - generic [ref=e483]: "8"
+                        - generic [ref=e484]: "9"
+                        - generic [ref=e485]: "10"
+                        - generic [ref=e486]: "11"
+                        - generic [ref=e487]: "12"
+                      - generic [ref=e490]:
+                        - generic:
+                          - generic: "{"
+                          - generic: "\"code\": 0,"
+                          - generic: "\"msg\": \"\","
+                          - generic: "\"data\": {"
+                          - generic: "\"id\": 0,"
+                          - generic: "\"username\": \"\","
+                          - generic: "\"email\": \"\","
+                          - generic: "\"realName\": \"\","
+                          - generic: "\"avatar\": \"\","
+                          - generic: "\"token\": \"\""
+                          - generic: "}"
+                          - generic: "}"
+    - generic [ref=e198]:
+      - text: Apache License 2.0 | Copyright
+      - 'generic "icon: copyright" [ref=e199]':
+        - img [ref=e200]
+      - text: 2019-
+      - link "Knife4j-v4.4.0" [ref=e202] [cursor=pointer]:
+        - /url: https://gitee.com/xiaoym/knife4j

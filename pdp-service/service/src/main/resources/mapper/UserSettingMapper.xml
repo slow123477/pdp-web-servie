@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.slow.service.mapper.UserSettingMapper">
+
+    <resultMap id="BaseResultMap" type="com.slow.pojo.entity.UserSetting">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="gpa_standard" property="gpaStandard"/>
+        <result column="gpa_scale" property="gpaScale"/>
+        <result column="ai_dimensions" property="aiDimensions"/>
+        <result column="theme" property="theme"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, gpa_standard, gpa_scale, ai_dimensions, theme, created_at, updated_at
+    </sql>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM user_settings
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_settings (user_id, gpa_standard, gpa_scale, ai_dimensions, theme)
+        VALUES (#{userId}, #{gpaStandard}, #{gpaScale}, #{aiDimensions}, #{theme})
+    </insert>
+
+    <update id="updateByUserId">
+        UPDATE user_settings
+        <set>
+            <if test="gpaStandard != null">gpa_standard = #{gpaStandard},</if>
+            <if test="gpaScale != null">gpa_scale = #{gpaScale},</if>
+            <if test="aiDimensions != null">ai_dimensions = #{aiDimensions},</if>
+            <if test="theme != null">theme = #{theme}</if>
+        </set>
+        WHERE user_id = #{userId}
+    </update>
+
+</mapper>

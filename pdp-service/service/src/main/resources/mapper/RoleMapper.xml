@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.slow.service.mapper.RoleMapper">
+
+    <resultMap id="BaseResultMap" type="com.slow.pojo.entity.Role">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="role_name" property="roleName"/>
+        <result column="organization" property="organization"/>
+        <result column="start_date" property="startDate"/>
+        <result column="end_date" property="endDate"/>
+        <result column="is_current" property="isCurrent"/>
+        <result column="responsibilities" property="responsibilities"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, role_name, organization, start_date, end_date, is_current, responsibilities, created_at, updated_at
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM roles
+        <where>
+            user_id = #{userId}
+            <if test="isCurrent != null">
+                AND is_current = #{isCurrent}
+            </if>
+        </where>
+        ORDER BY start_date DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM roles
+        WHERE id = #{id} AND user_id = #{userId}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO roles (user_id, role_name, organization, start_date, end_date, is_current, responsibilities)
+        VALUES (#{userId}, #{roleName}, #{organization}, #{startDate}, #{endDate}, #{isCurrent}, #{responsibilities})
+    </insert>
+
+    <update id="update">
+        UPDATE roles
+        <set>
+            <if test="roleName != null">role_name = #{roleName},</if>
+            <if test="organization != null">organization = #{organization},</if>
+            <if test="startDate != null">start_date = #{startDate},</if>
+            <if test="endDate != null">end_date = #{endDate},</if>
+            <if test="isCurrent != null">is_current = #{isCurrent},</if>
+            <if test="responsibilities != null">responsibilities = #{responsibilities}</if>
+        </set>
+        WHERE id = #{id} AND user_id = #{userId}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM roles WHERE id = #{id} AND user_id = #{userId}
+    </delete>
+
+</mapper>

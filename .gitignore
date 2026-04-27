@@ -66,6 +66,7 @@ pdp-service/.factorypath
 # Claude / AI
 # ====================
 .claude/
+.playwright-mcp/
 
 # ====================
 # Sensitive Config (if needed)

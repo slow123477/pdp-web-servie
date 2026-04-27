@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.slow.service.mapper.AiAnalysisMapper">
+
+    <resultMap id="BaseResultMap" type="com.slow.pojo.entity.AiAnalysis">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="analysis_type" property="analysisType"/>
+        <result column="dimensions" property="dimensions"/>
+        <result column="report_content" property="reportContent"/>
+        <result column="strengths" property="strengths"/>
+        <result column="weaknesses" property="weaknesses"/>
+        <result column="suggestions" property="suggestions"/>
+        <result column="competitiveness" property="competitiveness"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, analysis_type, dimensions, report_content, strengths, weaknesses, suggestions, competitiveness, created_at
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM ai_analysis
+        WHERE user_id = #{userId}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM ai_analysis
+        WHERE id = #{id} AND user_id = #{userId}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ai_analysis (user_id, analysis_type, dimensions, report_content, strengths, weaknesses, suggestions, competitiveness)
+        VALUES (#{userId}, #{analysisType}, #{dimensions}, #{reportContent}, #{strengths}, #{weaknesses}, #{suggestions}, #{competitiveness})
+    </insert>
+
+    <delete id="deleteById">
+        DELETE FROM ai_analysis WHERE id = #{id} AND user_id = #{userId}
+    </delete>
+
+</mapper>

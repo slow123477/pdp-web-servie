@@ -109,6 +109,12 @@
             <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
         </dependency>
 
+        <!-- Spring AI OpenAI -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

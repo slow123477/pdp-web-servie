@@ -29,7 +29,6 @@ const form = reactive({
     resume_optimization: false,
     competitiveness_analysis: true,
   },
-  theme: 'light',
 })
 
 const gpaStandardOptions = [
@@ -49,11 +48,10 @@ async function fetchSettings() {
   loading.value = true
   try {
     const res = await request.get('/settings')
-    const data = res.data || {}
+    const data = res || {}
     if (data.gpaStandard) form.gpaStandard = data.gpaStandard
     if (data.gpaScale) Object.assign(form.gpaScale, data.gpaScale)
     if (data.aiDimensions) Object.assign(form.aiDimensions, data.aiDimensions)
-    if (data.theme) form.theme = data.theme
   } catch (error) {
     console.error(error)
   } finally {
@@ -122,7 +120,6 @@ async function handleSave() {
       gpaStandard: form.gpaStandard,
       gpaScale: form.gpaScale,
       aiDimensions: form.aiDimensions,
-      theme: form.theme,
     })
     ElMessage.success('设置已保存')
   } catch (error) {
@@ -224,27 +221,6 @@ onMounted(() => {
           >
             <el-switch v-model="form.aiDimensions[key]" />
             <span class="dimension-label">{{ label }}</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- 主题设置 -->
-      <div class="setting-card">
-        <h3 class="card-title">主题</h3>
-        <div class="radio-group">
-          <label
-            class="radio-item"
-            :class="{ active: form.theme === 'light' }"
-          >
-            <input v-model="form.theme" type="radio" value="light" />
-            <span>明亮模式</span>
-          </label>
-          <label
-            class="radio-item"
-            :class="{ active: form.theme === 'dark' }"
-          >
-            <input v-model="form.theme" type="radio" value="dark" />
-            <span>深色模式</span>
           </label>
         </div>
       </div>
@@ -351,6 +327,7 @@ onMounted(() => {
 }
 
 .radio-item {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -376,7 +353,11 @@ onMounted(() => {
 }
 
 .radio-item input {
-  display: none;
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
 }
 
 /* Scale Table */

@@ -109,6 +109,8 @@ async function handleAnalyze() {
   try {
     const res = await request.post('/ai-analysis', {
       dimensions: selectedDimensions.value,
+    }, {
+      timeout: 120000,
     })
     const data = res || {}
     Object.assign(report, data)

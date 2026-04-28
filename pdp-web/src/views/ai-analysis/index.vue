@@ -110,7 +110,7 @@ async function handleAnalyze() {
     const res = await request.post('/ai-analysis', {
       dimensions: selectedDimensions.value,
     })
-    const data = res.data || {}
+    const data = res || {}
     Object.assign(report, data)
     resultVisible.value = true
     await nextTick()
@@ -131,7 +131,7 @@ async function fetchHistory() {
     const res = await request.get('/ai-analysis', {
       params: { page: 1, pageSize: 10 },
     })
-    historyList.value = res.data?.rows || []
+    historyList.value = res.rows || []
   } catch (error) {
     console.error(error)
     historyList.value = []
@@ -143,7 +143,7 @@ async function fetchHistory() {
 async function viewHistory(item) {
   try {
     const res = await request.get(`/ai-analysis/${item.id}`)
-    const data = res.data || {}
+    const data = res || {}
     Object.assign(report, data)
     resultVisible.value = true
     await nextTick()
@@ -353,6 +353,7 @@ onMounted(() => {
 }
 
 .dimension-checkbox {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -378,7 +379,11 @@ onMounted(() => {
 }
 
 .dimension-checkbox input {
-  display: none;
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
 }
 
 .btn-primary {

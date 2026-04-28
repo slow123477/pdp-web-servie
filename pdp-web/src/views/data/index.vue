@@ -57,7 +57,7 @@ async function handleExport() {
     const res = await request.get('/data/export', {
       params: { dataType: exportType.value },
     })
-    const url = res.data?.downloadUrl
+    const url = res?.downloadUrl
     if (url) {
       window.open(url, '_blank')
       ElMessage.success('导出成功')
@@ -83,7 +83,7 @@ async function fetchOperations() {
         pageSize: 50,
       },
     })
-    rawList.value = res.data?.rows || []
+    rawList.value = res.rows || []
   } catch (error) {
     console.error(error)
     rawList.value = []

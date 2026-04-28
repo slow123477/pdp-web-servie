@@ -298,7 +298,7 @@ onMounted(() => {
 .card-desc {
   font-size: 0.875rem;
   color: oklch(62% 0.02 30);
-  margin: -0.5rem 0 1rem;
+  margin: 0.25rem 0 1rem;
 }
 
 .card-actions {

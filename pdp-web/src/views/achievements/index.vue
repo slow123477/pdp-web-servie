@@ -136,7 +136,7 @@ async function handleCertificateUpload(options) {
     form.certificateUrl = res
     ElMessage.success('上传成功')
   } catch (error) {
-    console.error(error)
+    ElMessage.error(error?.message || '操作失败')
   } finally {
     uploadLoading.value = false
   }
@@ -167,7 +167,7 @@ async function handleSave() {
     dialogVisible.value = false
     fetchList()
   } catch (error) {
-    console.error(error)
+    ElMessage.error(error?.message || '操作失败')
   } finally {
     saving.value = false
   }
@@ -180,7 +180,7 @@ async function handleDelete(row) {
     ElMessage.success('删除成功')
     fetchList()
   } catch (error) {
-    if (error !== 'cancel') console.error(error)
+    if (error !== 'cancel') ElMessage.error(error?.message || '删除失败')
   }
 }
 
@@ -197,7 +197,7 @@ async function fetchList() {
     })
     rawList.value = res.rows || []
   } catch (error) {
-    console.error(error)
+    ElMessage.error(error?.message || '操作失败')
     rawList.value = []
   } finally {
     loading.value = false
@@ -216,7 +216,7 @@ onMounted(() => {
       <div>
         <h1 class="page-title">成就管理</h1>
       </div>
-      <button class="btn-primary" @click="openAddDialog">+ 添加成就</button>
+      <button type="button" class="btn-primary" @click="openAddDialog">+ 添加成就</button>
     </div>
 
     <!-- Filter -->
@@ -270,8 +270,8 @@ onMounted(() => {
               </span>
             </div>
             <div class="card-actions">
-              <button class="btn-text" @click="openEditDialog(item)">编辑</button>
-              <button class="btn-text danger" @click="handleDelete(item)">删除</button>
+              <button type="button" class="btn-text" @click="openEditDialog(item)">编辑</button>
+              <button type="button" class="btn-text danger" @click="handleDelete(item)">删除</button>
             </div>
           </div>
 
@@ -372,7 +372,7 @@ onMounted(() => {
 
       <template #footer>
         <div class="dialog-footer">
-          <button class="btn-secondary" @click="dialogVisible = false">取消</button>
+          <button type="button" class="btn-secondary" @click="dialogVisible = false">取消</button>
           <button class="btn-primary" :disabled="saving" @click="handleSave">
             {{ saving ? '保存中...' : '保存' }}
           </button>
@@ -399,7 +399,7 @@ onMounted(() => {
 }
 
 .page-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 2rem;
   font-weight: 400;
@@ -596,7 +596,7 @@ onMounted(() => {
 }
 
 .card-name {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 1.25rem;
   font-weight: 400;

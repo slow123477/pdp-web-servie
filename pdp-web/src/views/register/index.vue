@@ -196,7 +196,7 @@ async function handleRegister() {
 }
 
 .brand-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 2.5rem;
   color: oklch(58% 0.16 20);
@@ -225,7 +225,7 @@ async function handleRegister() {
 }
 
 .form-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 2rem;
   margin-bottom: 0.25rem;

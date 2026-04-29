@@ -118,7 +118,7 @@ async function handleSave() {
     dialogVisible.value = false
     fetchList()
   } catch (error) {
-    console.error(error)
+    ElMessage.error(error?.message || '操作失败')
   } finally {
     saving.value = false
   }
@@ -131,7 +131,7 @@ async function handleDelete(row) {
     ElMessage.success('删除成功')
     fetchList()
   } catch (error) {
-    if (error !== 'cancel') console.error(error)
+    if (error !== 'cancel') ElMessage.error(error?.message || '操作失败')
   }
 }
 
@@ -147,7 +147,7 @@ async function fetchList() {
     })
     rawList.value = res.rows || []
   } catch (error) {
-    console.error(error)
+    ElMessage.error(error?.message || '操作失败')
     rawList.value = []
   } finally {
     loading.value = false
@@ -166,7 +166,7 @@ onMounted(() => {
       <div>
         <h1 class="page-title">角色管理</h1>
       </div>
-      <button class="btn-primary" @click="openAddDialog">+ 添加角色</button>
+      <button type="button" class="btn-primary" @click="openAddDialog">+ 添加角色</button>
     </div>
 
     <!-- Filter -->
@@ -212,8 +212,8 @@ onMounted(() => {
           <p v-if="item.responsibilities" class="role-desc">{{ item.responsibilities }}</p>
 
           <div class="role-actions">
-            <button class="btn-text" @click="openEditDialog(item)">编辑</button>
-            <button class="btn-text danger" @click="handleDelete(item)">删除</button>
+            <button type="button" class="btn-text" @click="openEditDialog(item)">编辑</button>
+            <button type="button" class="btn-text danger" @click="handleDelete(item)">删除</button>
           </div>
         </div>
       </div>
@@ -259,8 +259,8 @@ onMounted(() => {
 
         <el-form-item label="是否在职">
           <el-radio-group v-model="form.isCurrent">
-            <el-radio :label="1">在职</el-radio>
-            <el-radio :label="0">已离职</el-radio>
+            <el-radio :value="1">在职</el-radio>
+            <el-radio :value="0">已离职</el-radio>
           </el-radio-group>
         </el-form-item>
 
@@ -276,8 +276,8 @@ onMounted(() => {
 
       <template #footer>
         <div class="dialog-footer">
-          <button class="btn-secondary" @click="dialogVisible = false">取消</button>
-          <button class="btn-primary" :disabled="saving" @click="handleSave">
+          <button type="button" class="btn-secondary" @click="dialogVisible = false">取消</button>
+          <button type="button" class="btn-primary" :disabled="saving" @click="handleSave">
             {{ saving ? '保存中...' : '保存' }}
           </button>
         </div>
@@ -303,7 +303,7 @@ onMounted(() => {
 }
 
 .page-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 2rem;
   font-weight: 400;
@@ -455,7 +455,7 @@ onMounted(() => {
 }
 
 .role-name {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 1.25rem;
   font-weight: 400;

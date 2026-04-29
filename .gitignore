@@ -67,7 +67,8 @@ pdp-service/.factorypath
 # ====================
 .claude/
 .playwright-mcp/
-
+.impeccable.md
+CLAUDE.md
 # ====================
 # Sensitive Config (if needed)
 # Uncomment to ignore local config overrides

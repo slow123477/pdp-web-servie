@@ -34,7 +34,7 @@ async function fetchUserInfo() {
     Object.assign(profile, res)
     userStore.setUserInfo(res)
   } catch (error) {
-    console.error(error)
+    ElMessage.error(error?.message || '操作失败')
   } finally {
     loading.value = false
   }
@@ -54,7 +54,7 @@ async function handleSaveProfile() {
     ElMessage.success('资料保存成功')
     userStore.setUserInfo({ ...userStore.userInfo, ...profile })
   } catch (error) {
-    console.error(error)
+    ElMessage.error(error?.message || '操作失败')
   } finally {
     savingProfile.value = false
   }
@@ -84,7 +84,7 @@ async function handleChangePassword() {
     passwordForm.newPassword = ''
     passwordForm.confirmPassword = ''
   } catch (error) {
-    console.error(error)
+    ElMessage.error(error?.message || '操作失败')
   } finally {
     savingPassword.value = false
   }
@@ -101,7 +101,7 @@ async function handleAvatarUpload(options) {
     userStore.setUserInfo({ ...userStore.userInfo, avatar: res })
     ElMessage.success('头像上传成功')
   } catch (error) {
-    console.error(error)
+    ElMessage.error(error?.message || '操作失败')
   }
 }
 
@@ -142,7 +142,7 @@ onMounted(() => {
               :http-request="handleAvatarUpload"
               accept="image/*"
             >
-              <button class="btn-change-avatar">更换头像</button>
+              <button type="button" class="btn-change-avatar">更换头像</button>
             </el-upload>
           </div>
         </aside>
@@ -181,7 +181,7 @@ onMounted(() => {
                 </select>
               </div>
             </div>
-            <button class="btn-primary" :disabled="savingProfile" @click="handleSaveProfile">
+            <button type="button" class="btn-primary" :disabled="savingProfile" @click="handleSaveProfile">
               {{ savingProfile ? '保存中...' : '保存修改' }}
             </button>
           </div>
@@ -203,7 +203,7 @@ onMounted(() => {
                 <input v-model="passwordForm.confirmPassword" type="password" placeholder="再次输入新密码" />
               </div>
             </div>
-            <button class="btn-primary" :disabled="savingPassword" @click="handleChangePassword">
+            <button type="button" class="btn-primary" :disabled="savingPassword" @click="handleChangePassword">
               {{ savingPassword ? '更新中...' : '更新密码' }}
             </button>
           </div>
@@ -223,7 +223,7 @@ onMounted(() => {
 }
 
 .page-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 2rem;
   font-weight: 400;
@@ -277,7 +277,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 1.5rem;
   border: 3px solid oklch(98% 0.008 30);
@@ -285,7 +285,7 @@ onMounted(() => {
 }
 
 .avatar-name {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 1.25rem;
   color: oklch(25% 0.02 30);
@@ -326,7 +326,7 @@ onMounted(() => {
 }
 
 .section-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 1.25rem;
   font-weight: 400;

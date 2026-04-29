@@ -87,9 +87,10 @@ public class DataOperationServiceImpl implements DataOperationService {
 
         Long userId = getCurrentUserId();
 
-        // 1. 保存上传文件
-        String savedFilePath = saveFile(file, "import");
-        String fileUrl = "/upload/import/" + savedFilePath;
+        // 1. 保存上传文件到磁盘（transferTo 会消费 MultipartFile 的流，必须先做）
+        Path savedPath = saveFile(file, "import");
+        String relativePath = uploadPathToRelative(savedPath);
+        String fileUrl = "/upload/" + relativePath;
 
         // 2. 创建操作记录
         DataOperation operation = new DataOperation();
@@ -101,12 +102,12 @@ public class DataOperationServiceImpl implements DataOperationService {
         dataOperationMapper.insert(operation);
 
         try {
-            // 3. 根据数据类型解析并导入
+            // 3. 根据数据类型解析并导入（从已保存的磁盘文件读取）
             switch (dataType) {
-                case "课程", "成绩" -> importCourses(file, userId);
-                case "经历" -> importExperiences(file, userId);
-                case "成就" -> importAchievements(file, userId);
-                case "角色" -> importRoles(file, userId);
+                case "课程", "成绩" -> importCourses(savedPath, userId);
+                case "经历" -> importExperiences(savedPath, userId);
+                case "成就" -> importAchievements(savedPath, userId);
+                case "角色" -> importRoles(savedPath, userId);
                 default -> throw new BusinessException("不支持的数据类型");
             }
 
@@ -190,8 +191,8 @@ public class DataOperationServiceImpl implements DataOperationService {
 
     // ==================== 导入逻辑 ====================
 
-    private void importCourses(MultipartFile file, Long userId) throws IOException {
-        List<CourseExcelData> list = EasyExcel.read(file.getInputStream())
+    private void importCourses(Path filePath, Long userId) {
+        List<CourseExcelData> list = EasyExcel.read(filePath.toString())
                 .head(CourseExcelData.class)
                 .sheet()
                 .doReadSync();
@@ -207,8 +208,8 @@ public class DataOperationServiceImpl implements DataOperationService {
         }
     }
 
-    private void importExperiences(MultipartFile file, Long userId) throws IOException {
-        List<ExperienceExcelData> list = EasyExcel.read(file.getInputStream())
+    private void importExperiences(Path filePath, Long userId) {
+        List<ExperienceExcelData> list = EasyExcel.read(filePath.toString())
                 .head(ExperienceExcelData.class)
                 .sheet()
                 .doReadSync();
@@ -226,8 +227,8 @@ public class DataOperationServiceImpl implements DataOperationService {
         }
     }
 
-    private void importAchievements(MultipartFile file, Long userId) throws IOException {
-        List<AchievementExcelData> list = EasyExcel.read(file.getInputStream())
+    private void importAchievements(Path filePath, Long userId) {
+        List<AchievementExcelData> list = EasyExcel.read(filePath.toString())
                 .head(AchievementExcelData.class)
                 .sheet()
                 .doReadSync();
@@ -244,8 +245,8 @@ public class DataOperationServiceImpl implements DataOperationService {
         }
     }
 
-    private void importRoles(MultipartFile file, Long userId) throws IOException {
-        List<RoleExcelData> list = EasyExcel.read(file.getInputStream())
+    private void importRoles(Path filePath, Long userId) {
+        List<RoleExcelData> list = EasyExcel.read(filePath.toString())
                 .head(RoleExcelData.class)
                 .sheet()
                 .doReadSync();
@@ -327,7 +328,7 @@ public class DataOperationServiceImpl implements DataOperationService {
 
     // ==================== 工具方法 ====================
 
-    private String saveFile(MultipartFile file, String subDir) {
+    private Path saveFile(MultipartFile file, String subDir) {
         String originalFilename = file.getOriginalFilename();
         String ext = getFileExtension(originalFilename);
         String dateDir = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
@@ -338,11 +339,17 @@ public class DataOperationServiceImpl implements DataOperationService {
             Files.createDirectories(targetDir);
             Path targetPath = targetDir.resolve(filename);
             file.transferTo(targetPath.toFile());
-            return dateDir + "/" + filename;
+            return targetPath;
         } catch (IOException e) {
             log.error("文件保存失败", e);
             throw new BusinessException("文件保存失败");
         }
+    }
+
+    private String uploadPathToRelative(Path savedPath) {
+        Path base = Paths.get(uploadPath).toAbsolutePath().normalize();
+        Path absolute = savedPath.toAbsolutePath().normalize();
+        return base.relativize(absolute).toString().replace('\\', '/');
     }
 
     private String generateFilename(String dataType, String ext) {

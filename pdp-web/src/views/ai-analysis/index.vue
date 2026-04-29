@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, nextTick, onMounted } from 'vue'
+import { ref, reactive, nextTick, onMounted, onUnmounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import request from '@/utils/request'
 import * as echarts from 'echarts'
@@ -18,7 +18,18 @@ const dimensionOptions = [
   { key: 'competitiveness_analysis', label: '竞争力分析' },
 ]
 
-const selectedDimensions = ref(['ability_assessment', 'development_direction', 'competitiveness_analysis'])
+const selectedDimensions = ref([])
+
+function sanitizeHtml(html) {
+  if (!html) return ''
+  return html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+    .replace(/javascript:/gi, '')
+    .replace(/on\w+\s*=/gi, '')
+}
+
+const sanitizedReportContent = computed(() => sanitizeHtml(report.reportContent))
 
 const report = reactive({
   id: null,
@@ -121,7 +132,7 @@ async function handleAnalyze() {
     }
     fetchHistory()
   } catch (error) {
-    console.error(error)
+    ElMessage.error(error?.message || '分析失败，请稍后重试')
   } finally {
     analyzing.value = false
   }
@@ -135,11 +146,15 @@ async function fetchHistory() {
     })
     historyList.value = res.rows || []
   } catch (error) {
-    console.error(error)
+    ElMessage.error(error?.message || '获取历史记录失败')
     historyList.value = []
   } finally {
     loadingHistory.value = false
   }
+}
+
+function closeResult() {
+  resultVisible.value = false
 }
 
 async function viewHistory(item) {
@@ -153,7 +168,7 @@ async function viewHistory(item) {
       initChart(data.dimensions)
     }
   } catch (error) {
-    console.error(error)
+    ElMessage.error(error?.message || '获取报告详情失败')
   }
 }
 
@@ -164,7 +179,9 @@ async function handleDelete(item) {
     ElMessage.success('删除成功')
     fetchHistory()
   } catch (error) {
-    if (error !== 'cancel') console.error(error)
+    if (error !== 'cancel') {
+      ElMessage.error(error?.message || '删除失败')
+    }
   }
 }
 
@@ -174,9 +191,36 @@ function formatDate(str) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
+async function fetchSettings() {
+  try {
+    const res = await request.get('/settings')
+    const data = res || {}
+    if (data.aiDimensions) {
+      selectedDimensions.value = Object.entries(data.aiDimensions)
+        .filter(([_, val]) => val)
+        .map(([key]) => key)
+    }
+    // 兜底：如果设置为空或不存在，使用默认维度
+    if (selectedDimensions.value.length === 0) {
+      selectedDimensions.value = ['ability_assessment', 'development_direction', 'competitiveness_analysis']
+    }
+  } catch (error) {
+    selectedDimensions.value = ['ability_assessment', 'development_direction', 'competitiveness_analysis']
+  }
+}
+
 onMounted(() => {
+  fetchSettings()
   fetchHistory()
   window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+  if (chartInstance) {
+    chartInstance.dispose()
+    chartInstance = null
+  }
 })
 </script>
 
@@ -212,7 +256,10 @@ onMounted(() => {
     <div v-if="resultVisible" class="result-panel">
       <div class="result-header">
         <h3 class="result-title">{{ report.analysisType || '个人发展分析报告' }}</h3>
-        <span v-if="report.createdAt" class="result-date">{{ formatDate(report.createdAt) }}</span>
+        <div class="result-meta">
+          <span v-if="report.createdAt" class="result-date">{{ formatDate(report.createdAt) }}</span>
+          <button class="btn-text close-btn" @click="closeResult">收起</button>
+        </div>
       </div>
 
       <!-- Radar Chart -->
@@ -221,7 +268,7 @@ onMounted(() => {
       </div>
 
       <!-- Report Content -->
-      <div v-if="report.reportContent" class="report-content" v-html="report.reportContent"></div>
+      <div v-if="report.reportContent" class="report-content" v-html="sanitizedReportContent"></div>
 
       <!-- Cards Grid -->
       <div class="insight-grid">
@@ -315,7 +362,7 @@ onMounted(() => {
 }
 
 .page-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 2rem;
   font-weight: 400;
@@ -339,7 +386,7 @@ onMounted(() => {
 }
 
 .panel-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 1.125rem;
   font-weight: 400;
@@ -430,7 +477,7 @@ onMounted(() => {
 }
 
 .result-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 1.25rem;
   font-weight: 400;
@@ -441,6 +488,29 @@ onMounted(() => {
 .result-date {
   font-size: 0.875rem;
   color: oklch(62% 0.02 30);
+}
+
+.result-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.close-btn {
+  font-size: 0.875rem;
+  color: oklch(70% 0.14 20);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+  color: oklch(58% 0.16 20);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .chart-wrapper {
@@ -465,7 +535,7 @@ onMounted(() => {
 .report-content :deep(h1),
 .report-content :deep(h2),
 .report-content :deep(h3) {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   color: oklch(25% 0.02 30);
   margin: 1rem 0 0.5rem;
@@ -503,7 +573,7 @@ onMounted(() => {
 }
 
 .insight-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 1rem;
   font-weight: 400;
@@ -543,7 +613,7 @@ onMounted(() => {
 }
 
 .section-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 1rem;
   font-weight: 400;

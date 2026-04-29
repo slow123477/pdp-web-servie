@@ -54,13 +54,39 @@ const currentSemesterGpa = computed(() => {
 })
 
 const gpaTrend = computed(() => {
+  if (semesterStats.value.length === 0) return []
+  const gpas = semesterStats.value.map((s) => parseFloat(s.gpa))
+  const maxGpa = Math.max(...gpas, 0.01)
   return semesterStats.value.map((s) => ({
     semester: s.semester,
     gpa: parseFloat(s.gpa),
-    height: Math.round((parseFloat(s.gpa) / 4.0) * 100),
     isCurrent: s.semester === semesterStats.value[semesterStats.value.length - 1]?.semester,
+    height: Math.max(10, Math.round((parseFloat(s.gpa) / maxGpa) * 100)),
   }))
 })
+
+const maxSemesterGpa = computed(() => Math.max(...semesterStats.value.map((s) => parseFloat(s.gpa)), 0.01))
+
+const CHART_W = 600
+const CHART_H = 180
+const PAD = { t: 25, r: 20, b: 25, l: 20 }
+
+const trendPoints = computed(() => {
+  if (gpaTrend.value.length === 0) return []
+  const gpas = gpaTrend.value.map((i) => i.gpa)
+  const maxGpa = Math.max(...gpas, 0.01)
+  const minGpa = Math.min(...gpas, 0)
+  const range = maxGpa - minGpa || 1
+  const availW = CHART_W - PAD.l - PAD.r
+  const availH = CHART_H - PAD.t - PAD.b
+  return gpaTrend.value.map((item, index) => {
+    const x = PAD.l + (gpaTrend.value.length === 1 ? availW / 2 : (index / (gpaTrend.value.length - 1)) * availW)
+    const y = PAD.t + availH - ((item.gpa - minGpa) / range) * availH
+    return { x, y, isCurrent: item.isCurrent, gpa: item.gpa, semester: item.semester }
+  })
+})
+
+const trendLinePoints = computed(() => trendPoints.value.map((p) => `${p.x},${p.y}`).join(' '))
 
 function scoreClass(score) {
   if (score >= 90) return 'excellent'
@@ -186,20 +212,62 @@ onMounted(() => {
             <span class="section-desc">各学期加权 GPA 变化</span>
           </div>
           <div class="chart-container">
-            <div v-if="gpaTrend.length" class="chart-bars" role="img" aria-label="各学期 GPA 柱状图">
-              <div v-for="item in gpaTrend" :key="item.semester" class="chart-bar-group">
-                <div
-                  class="chart-bar"
-                  :class="{ 'is-current': item.isCurrent }"
-                  :style="{ height: item.height + '%' }"
-                >
-                  <span class="chart-bar-value">{{ item.gpa }}</span>
-                </div>
-                <span class="chart-bar-label" :class="{ 'is-current': item.isCurrent }">
-                  {{ item.semester }}
-                </span>
-              </div>
-            </div>
+            <svg
+              v-if="gpaTrend.length"
+              class="trend-chart"
+              :viewBox="`0 0 ${CHART_W} ${CHART_H}`"
+              preserveAspectRatio="none"
+              role="img"
+              aria-label="各学期 GPA 折线图"
+            >
+              <line
+                v-for="gy in [PAD.t, PAD.t + (CHART_H - PAD.t - PAD.b) / 2, CHART_H - PAD.b]"
+                :key="gy"
+                :x1="PAD.l"
+                :y1="gy"
+                :x2="CHART_W - PAD.r"
+                :y2="gy"
+                stroke="oklch(88% 0.015 30)"
+                stroke-width="0.5"
+                stroke-dasharray="4"
+              />
+              <polyline
+                :points="trendLinePoints"
+                fill="none"
+                stroke="oklch(70% 0.14 20)"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <circle
+                v-for="p in trendPoints"
+                :key="p.x"
+                :cx="p.x"
+                :cy="p.y"
+                r="4"
+                :fill="p.isCurrent ? 'oklch(70% 0.14 20)' : 'white'"
+                stroke="oklch(70% 0.14 20)"
+                stroke-width="2"
+              />
+              <text
+                v-for="p in trendPoints"
+                :key="'v' + p.x"
+                :x="p.x"
+                :y="p.y - 10"
+                text-anchor="middle"
+                font-size="12"
+                fill="oklch(25% 0.02 30)"
+              >{{ p.gpa.toFixed(2) }}</text>
+              <text
+                v-for="p in trendPoints"
+                :key="'l' + p.x"
+                :x="p.x"
+                :y="CHART_H - 8"
+                text-anchor="middle"
+                font-size="11"
+                fill="oklch(62% 0.02 30)"
+              >{{ p.semester }}</text>
+            </svg>
             <div v-else class="empty-chart">暂无 GPA 数据</div>
           </div>
         </section>
@@ -249,7 +317,7 @@ onMounted(() => {
                 <span>{{ s.count }} 门 / {{ s.credits }} 学分</span>
               </div>
               <div class="semester-bar-bg">
-                <div class="semester-bar-fill" :style="{ width: (parseFloat(s.gpa) / 4.0 * 100) + '%' }" />
+                <div class="semester-bar-fill" :style="{ width: (parseFloat(s.gpa) / maxSemesterGpa * 100) + '%' }" />
               </div>
             </div>
           </div>
@@ -486,54 +554,15 @@ onMounted(() => {
   padding-top: 0.75rem;
 }
 
-.chart-bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 1rem;
-  height: 160px;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid oklch(88% 0.015 30);
-}
-
-.chart-bar-group {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.chart-bar {
+.trend-chart {
   width: 100%;
-  max-width: 64px;
-  border-radius: 6px 6px 0 0;
-  background: oklch(68% 0.12 195);
-  position: relative;
-  transition: all 0.3s ease;
+  height: 180px;
+  overflow: visible;
 }
 
-.chart-bar.is-current {
-  background: oklch(70% 0.14 20);
-}
-
-.chart-bar-value {
-  position: absolute;
-  bottom: calc(100% + 4px);
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.875rem;
-  color: oklch(25% 0.02 30);
-  font-weight: 600;
-}
-
-.chart-bar-label {
-  font-size: 0.75rem;
-  color: oklch(62% 0.02 30);
-}
-
-.chart-bar-label.is-current {
-  color: oklch(25% 0.02 30);
-  font-weight: 500;
+.trend-chart text {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Noto Sans SC', sans-serif;
 }
 
 .empty-chart,
@@ -822,10 +851,6 @@ onMounted(() => {
   .grade-stats {
     width: 100%;
     justify-content: space-between;
-  }
-
-  .chart-bars {
-    gap: 0.5rem;
   }
 }
 </style>

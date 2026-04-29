@@ -89,8 +89,13 @@ const router = createRouter({
 // 路由守卫
 router.beforeEach((to) => {
   const userStore = useUserStore()
+  // 未登录访问非公开页面 → 拦截到登录页
   if (!to.meta.public && !userStore.isLoggedIn) {
     return { name: 'login', query: { redirect: to.fullPath } }
+  }
+  // 已登录访问登录/注册页 → 自动跳转到仪表盘
+  if (to.meta.public && userStore.isLoggedIn && (to.name === 'login' || to.name === 'register')) {
+    return { path: '/dashboard' }
   }
 })
 

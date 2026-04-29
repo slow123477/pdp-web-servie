@@ -37,11 +37,11 @@ async function handleLogin() {
     userStore.setToken(res.token, rememberMe.value)
     userStore.setUserInfo(res, rememberMe.value)
     ElMessage.success('登录成功，欢迎回来！')
-    const redirect = route.query.redirect || '/dashboard'
+    const rawRedirect = route.query.redirect || '/dashboard'
+    const redirect = typeof rawRedirect === 'string' && rawRedirect.startsWith('/') ? rawRedirect : '/dashboard'
     // 延迟一小段时间确保 Pinia token 同步完成
     setTimeout(() => {
-      router.push(redirect).catch((err) => {
-        console.warn('Router push failed, using fallback:', err)
+      router.push(redirect).catch(() => {
         window.location.href = redirect
       })
     }, 50)
@@ -176,7 +176,7 @@ async function handleLogin() {
 }
 
 .brand-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 2.5rem;
   color: oklch(58% 0.16 20);
@@ -205,7 +205,7 @@ async function handleLogin() {
 }
 
 .form-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 2rem;
   margin-bottom: 0.25rem;

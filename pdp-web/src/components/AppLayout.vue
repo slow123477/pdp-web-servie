@@ -136,7 +136,7 @@ function handleLogout() {
 }
 
 .nav-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 1.25rem;
   color: oklch(25% 0.02 30);
@@ -187,7 +187,7 @@ function handleLogout() {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 0.875rem;
   border: 2px solid oklch(98% 0.008 30);

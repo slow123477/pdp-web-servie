@@ -8,6 +8,7 @@ const dataTypeOptions = ['课程', '成绩', '经历', '成就', '角色']
 const importType = ref('课程')
 const importing = ref(false)
 const importFile = ref(null)
+const uploadRef = ref(null)
 
 const exportType = ref('课程')
 const exporting = ref(false)
@@ -43,9 +44,10 @@ async function handleImport() {
     })
     ElMessage.success('导入成功')
     importFile.value = null
+    uploadRef.value?.clearFiles()
     fetchOperations()
   } catch (error) {
-    console.error(error)
+    ElMessage.error(error?.message || '导入失败')
   } finally {
     importing.value = false
   }
@@ -66,7 +68,7 @@ async function handleExport() {
       ElMessage.warning('未获取到下载链接')
     }
   } catch (error) {
-    console.error(error)
+    ElMessage.error(error?.message || '导出失败')
   } finally {
     exporting.value = false
   }
@@ -85,7 +87,7 @@ async function fetchOperations() {
     })
     rawList.value = res.rows || []
   } catch (error) {
-    console.error(error)
+    ElMessage.error(error?.message || '获取记录失败')
     rawList.value = []
   } finally {
     loading.value = false
@@ -129,6 +131,7 @@ onMounted(() => {
         <div class="form-group">
           <label class="form-label">选择文件</label>
           <el-upload
+            ref="uploadRef"
             drag
             :auto-upload="false"
             :show-file-list="true"
@@ -247,7 +250,7 @@ onMounted(() => {
 }
 
 .page-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 2rem;
   font-weight: 400;
@@ -292,7 +295,7 @@ onMounted(() => {
 }
 
 .card-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 1.125rem;
   font-weight: 400;
@@ -432,7 +435,7 @@ onMounted(() => {
 }
 
 .section-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 1.125rem;
   font-weight: 400;

@@ -4,13 +4,40 @@ import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
 import request from '@/utils/request'
 
+function sanitizeHtml(html) {
+  if (!html) return ''
+  return html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+    .replace(/javascript:/gi, '')
+    .replace(/on\w+\s*=/gi, '')
+}
+
 const userStore = useUserStore()
 const router = useRouter()
 
 const username = computed(() => userStore.userInfo?.username || '同学')
 
+const gradeInfo = computed(() => {
+  const grade = userStore.userInfo?.gradeYear
+  if (!grade) return null
+
+  const month = new Date().getMonth() + 1
+  const semester = month >= 3 && month <= 8 ? '第二学期' : '第一学期'
+
+  const gradeMap = ['', '大一', '大二', '大三', '大四']
+  return `${gradeMap[grade] || '已毕业'} · ${semester}`
+})
+
 const today = new Date()
 const dateStr = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`
+
+const genericGreeting = computed(() => {
+  const hour = new Date().getHours()
+  if (hour < 12) return '上午好'
+  if (hour < 18) return '下午好'
+  return '晚上好'
+})
 
 const loading = ref(false)
 
@@ -42,6 +69,35 @@ const gpaHistory = computed(() => {
 })
 
 const recentActivities = computed(() => dashboardData.value.recentActivities || [])
+
+const sanitizedAiSummary = computed(() => sanitizeHtml(dashboardData.value.aiSummary))
+
+const aiHistoryList = ref([])
+const aiHistoryTotal = ref(0)
+
+const aiHistoryCount = computed(() => aiHistoryTotal.value)
+const latestAiDate = computed(() => {
+  if (aiHistoryList.value.length === 0) return null
+  const latest = aiHistoryList.value[0]
+  return latest?.createdAt || null
+})
+
+function formatDate(str) {
+  if (!str) return ''
+  const d = new Date(str)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+async function fetchAiHistory() {
+  try {
+    const res = await request.get('/ai-analysis', { params: { page: 1, pageSize: 1 } })
+    aiHistoryList.value = res.rows || []
+    aiHistoryTotal.value = res.total || 0
+  } catch (error) {
+    aiHistoryList.value = []
+    aiHistoryTotal.value = 0
+  }
+}
 
 const CHART_W = 600
 const CHART_H = 180
@@ -83,7 +139,7 @@ async function fetchDashboard() {
       dashboardData.value = { ...dashboardData.value, ...res }
     }
   } catch (error) {
-    console.error(error)
+    // 静默失败，仪表盘空状态比错误提示更友好
   } finally {
     loading.value = false
   }
@@ -91,6 +147,7 @@ async function fetchDashboard() {
 
 onMounted(() => {
   fetchDashboard()
+  fetchAiHistory()
 })
 </script>
 
@@ -109,7 +166,8 @@ onMounted(() => {
       </div>
       <div class="welcome-date">
         <div>{{ dateStr }}</div>
-        <div style="margin-top: 4px">大三 · 第二学期</div>
+        <div v-if="gradeInfo" style="margin-top: 4px">{{ gradeInfo }}</div>
+        <div v-else style="margin-top: 4px">{{ genericGreeting }}</div>
       </div>
     </header>
 
@@ -284,7 +342,11 @@ onMounted(() => {
             <span class="ai-icon" aria-hidden="true">✨</span>
             <h2 class="ai-title">AI 发展分析</h2>
           </div>
-          <p class="ai-summary" v-html="dashboardData.aiSummary || 'AI 分析报告暂未生成，快去录入你的课程、经历和成就数据吧！'" />
+          <p class="ai-summary" v-html="sanitizedAiSummary || 'AI 分析报告暂未生成，快去录入你的课程、经历和成就数据吧！'" />
+          <div v-if="aiHistoryCount > 0" class="ai-stats">
+            已生成 {{ aiHistoryCount }} 份分析报告
+            <span v-if="latestAiDate">· 最近 {{ formatDate(latestAiDate) }}</span>
+          </div>
           <button class="ai-btn" @click="goTo('/ai-analysis')">
             查看完整报告 →
           </button>
@@ -341,7 +403,7 @@ onMounted(() => {
 }
 
 .welcome-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 2.5rem;
   font-weight: 400;
@@ -447,7 +509,7 @@ onMounted(() => {
 }
 
 .metric-value {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 2.5rem;
   color: oklch(25% 0.02 30);
@@ -529,7 +591,7 @@ onMounted(() => {
 }
 
 .section-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 1.25rem;
   font-weight: 400;
@@ -692,7 +754,7 @@ onMounted(() => {
 }
 
 .ai-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 1.25rem;
   font-weight: 400;
@@ -705,11 +767,30 @@ onMounted(() => {
   line-height: 1.7;
   margin-bottom: 1rem;
   position: relative;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.ai-summary::-webkit-scrollbar {
+  width: 5px;
+}
+
+.ai-summary::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ai-summary::-webkit-scrollbar-thumb {
+  background: oklch(85% 0.015 30);
+  border-radius: 3px;
+}
+
+.ai-summary::-webkit-scrollbar-thumb:hover {
+  background: oklch(75% 0.02 30);
 }
 
 .ai-summary :deep(h2),
 .ai-summary :deep(h3) {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 1rem;
   font-weight: 500;
@@ -738,6 +819,13 @@ onMounted(() => {
 
 .ai-summary :deep(li) {
   margin: 0.25rem 0;
+}
+
+.ai-stats {
+  font-size: 0.8125rem;
+  color: oklch(62% 0.15 300);
+  margin-bottom: 1rem;
+  position: relative;
 }
 
 .ai-btn {

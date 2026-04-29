@@ -53,7 +53,7 @@ async function fetchSettings() {
     if (data.gpaScale) Object.assign(form.gpaScale, data.gpaScale)
     if (data.aiDimensions) Object.assign(form.aiDimensions, data.aiDimensions)
   } catch (error) {
-    console.error(error)
+    ElMessage.error(error?.message || '获取设置失败')
   } finally {
     loading.value = false
   }
@@ -123,7 +123,7 @@ async function handleSave() {
     })
     ElMessage.success('设置已保存')
   } catch (error) {
-    console.error(error)
+    ElMessage.error(error?.message || '保存失败')
   } finally {
     saving.value = false
   }
@@ -249,7 +249,7 @@ onMounted(() => {
 }
 
 .page-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 2rem;
   font-weight: 400;
@@ -287,7 +287,7 @@ onMounted(() => {
 }
 
 .card-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 1.125rem;
   font-weight: 400;

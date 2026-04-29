@@ -30,15 +30,39 @@ const dashboardData = ref({
 })
 
 const gpaHistory = computed(() => {
-  return (dashboardData.value.gpaHistory || []).map((item) => ({
+  const history = dashboardData.value.gpaHistory || []
+  if (history.length === 0) return []
+  const maxGpa = Math.max(...history.map((i) => i.gpa), 0.01)
+  return history.map((item, index) => ({
     semester: item.semester,
     gpa: item.gpa,
-    height: Math.round((item.gpa / 4.0) * 100),
-    current: false,
+    height: Math.max(4, Math.round((item.gpa / maxGpa) * 100)),
+    isCurrent: index === history.length - 1,
   }))
 })
 
 const recentActivities = computed(() => dashboardData.value.recentActivities || [])
+
+const CHART_W = 600
+const CHART_H = 180
+const PAD = { t: 25, r: 20, b: 25, l: 20 }
+
+const trendPoints = computed(() => {
+  if (gpaHistory.value.length === 0) return []
+  const gpas = gpaHistory.value.map((i) => i.gpa)
+  const maxGpa = Math.max(...gpas, 0.01)
+  const minGpa = Math.min(...gpas, 0)
+  const range = maxGpa - minGpa || 1
+  const availW = CHART_W - PAD.l - PAD.r
+  const availH = CHART_H - PAD.t - PAD.b
+  return gpaHistory.value.map((item, index) => {
+    const x = PAD.l + (gpaHistory.value.length === 1 ? availW / 2 : (index / (gpaHistory.value.length - 1)) * availW)
+    const y = PAD.t + availH - ((item.gpa - minGpa) / range) * availH
+    return { x, y, isCurrent: item.isCurrent, gpa: item.gpa, semester: item.semester }
+  })
+})
+
+const trendLinePoints = computed(() => trendPoints.value.map((p) => `${p.x},${p.y}`).join(' '))
 
 function goTo(path) {
   router.push(path)
@@ -108,7 +132,7 @@ onMounted(() => {
             v-for="item in gpaHistory"
             :key="item.semester"
             class="mini-bar"
-            :class="{ 'is-current': item.current }"
+            :class="{ 'is-current': item.isCurrent }"
             :style="{ height: item.height + '%' }"
           >
             <span class="mini-bar-label">{{ item.semester }}</span>
@@ -168,20 +192,62 @@ onMounted(() => {
             <a class="section-link" @click="goTo('/courses')">查看详情 →</a>
           </div>
           <div class="chart-container">
-            <div v-if="gpaHistory.length" class="chart-bars" role="img" aria-label="各学期 GPA 柱状图">
-              <div v-for="item in gpaHistory" :key="item.semester" class="chart-bar-group">
-                <div
-                  class="chart-bar"
-                  :class="{ 'is-current': item.current }"
-                  :style="{ height: item.height + '%' }"
-                >
-                  <span class="chart-bar-value">{{ item.gpa }}</span>
-                </div>
-                <span class="chart-bar-label" :class="{ 'is-current': item.current }">
-                  {{ item.semester }}
-                </span>
-              </div>
-            </div>
+            <svg
+              v-if="gpaHistory.length"
+              class="trend-chart"
+              :viewBox="`0 0 ${CHART_W} ${CHART_H}`"
+              preserveAspectRatio="none"
+              role="img"
+              aria-label="各学期 GPA 折线图"
+            >
+              <line
+                v-for="gy in [PAD.t, PAD.t + (CHART_H - PAD.t - PAD.b) / 2, CHART_H - PAD.b]"
+                :key="gy"
+                :x1="PAD.l"
+                :y1="gy"
+                :x2="CHART_W - PAD.r"
+                :y2="gy"
+                stroke="oklch(88% 0.015 30)"
+                stroke-width="0.5"
+                stroke-dasharray="4"
+              />
+              <polyline
+                :points="trendLinePoints"
+                fill="none"
+                stroke="oklch(70% 0.14 20)"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <circle
+                v-for="p in trendPoints"
+                :key="p.x"
+                :cx="p.x"
+                :cy="p.y"
+                r="4"
+                :fill="p.isCurrent ? 'oklch(70% 0.14 20)' : 'white'"
+                stroke="oklch(70% 0.14 20)"
+                stroke-width="2"
+              />
+              <text
+                v-for="p in trendPoints"
+                :key="'v' + p.x"
+                :x="p.x"
+                :y="p.y - 10"
+                text-anchor="middle"
+                font-size="12"
+                fill="oklch(25% 0.02 30)"
+              >{{ p.gpa.toFixed(2) }}</text>
+              <text
+                v-for="p in trendPoints"
+                :key="'l' + p.x"
+                :x="p.x"
+                :y="CHART_H - 8"
+                text-anchor="middle"
+                font-size="11"
+                fill="oklch(62% 0.02 30)"
+              >{{ p.semester }}</text>
+            </svg>
             <div v-else class="empty-chart">暂无 GPA 数据</div>
           </div>
         </section>
@@ -218,9 +284,7 @@ onMounted(() => {
             <span class="ai-icon" aria-hidden="true">✨</span>
             <h2 class="ai-title">AI 发展分析</h2>
           </div>
-          <p class="ai-summary">
-            {{ dashboardData.aiSummary || 'AI 分析报告暂未生成，快去录入你的课程、经历和成就数据吧！' }}
-          </p>
+          <p class="ai-summary" v-html="dashboardData.aiSummary || 'AI 分析报告暂未生成，快去录入你的课程、经历和成就数据吧！'" />
           <button class="ai-btn" @click="goTo('/ai-analysis')">
             查看完整报告 →
           </button>
@@ -490,54 +554,15 @@ onMounted(() => {
   padding-top: 0.75rem;
 }
 
-.chart-bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 1rem;
-  height: 140px;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid oklch(88% 0.015 30);
-}
-
-.chart-bar-group {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.chart-bar {
+.trend-chart {
   width: 100%;
-  max-width: 48px;
-  border-radius: 6px 6px 0 0;
-  background: oklch(68% 0.12 195);
-  position: relative;
-  transition: all 0.3s ease;
+  height: 180px;
+  overflow: visible;
 }
 
-.chart-bar.is-current {
-  background: oklch(70% 0.14 20);
-}
-
-.chart-bar-value {
-  position: absolute;
-  bottom: calc(100% + 4px);
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.75rem;
-  color: oklch(48% 0.025 30);
-  font-weight: 500;
-}
-
-.chart-bar-label {
-  font-size: 0.75rem;
-  color: oklch(62% 0.02 30);
-}
-
-.chart-bar-label.is-current {
-  color: oklch(25% 0.02 30);
-  font-weight: 500;
+.trend-chart text {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Noto Sans SC', sans-serif;
 }
 
 .empty-chart,
@@ -680,6 +705,39 @@ onMounted(() => {
   line-height: 1.7;
   margin-bottom: 1rem;
   position: relative;
+}
+
+.ai-summary :deep(h2),
+.ai-summary :deep(h3) {
+  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    'Georgia', serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: oklch(25% 0.02 30);
+  margin: 0.75rem 0 0.375rem;
+}
+
+.ai-summary :deep(h2:first-child),
+.ai-summary :deep(h3:first-child) {
+  margin-top: 0;
+}
+
+.ai-summary :deep(p) {
+  margin: 0.375rem 0;
+}
+
+.ai-summary :deep(strong) {
+  color: oklch(58% 0.16 20);
+  font-weight: 600;
+}
+
+.ai-summary :deep(ul) {
+  margin: 0.375rem 0;
+  padding-left: 1.25rem;
+}
+
+.ai-summary :deep(li) {
+  margin: 0.25rem 0;
 }
 
 .ai-btn {

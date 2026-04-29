@@ -38,7 +38,13 @@ async function handleLogin() {
     userStore.setUserInfo(res, rememberMe.value)
     ElMessage.success('登录成功，欢迎回来！')
     const redirect = route.query.redirect || '/dashboard'
-    await router.push(redirect)
+    // 延迟一小段时间确保 Pinia token 同步完成
+    setTimeout(() => {
+      router.push(redirect).catch((err) => {
+        console.warn('Router push failed, using fallback:', err)
+        window.location.href = redirect
+      })
+    }, 50)
   } catch (error) {
     formError.value = error.message || '登录失败，请检查用户名和密码'
   } finally {

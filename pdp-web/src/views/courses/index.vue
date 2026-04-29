@@ -140,7 +140,7 @@ async function handleAdd() {
     dialogVisible.value = false
     fetchList()
   } catch (error) {
-    console.error(error)
+    ElMessage.error(error?.message || '操作失败')
   }
 }
 
@@ -160,7 +160,7 @@ async function handleUpdate() {
     dialogVisible.value = false
     fetchList()
   } catch (error) {
-    console.error(error)
+    ElMessage.error(error?.message || '操作失败')
   }
 }
 
@@ -175,7 +175,9 @@ async function handleDelete(row) {
     ElMessage.success('删除成功')
     fetchList()
   } catch (error) {
-    if (error !== 'cancel') console.error(error)
+    if (error !== 'cancel') {
+      ElMessage.error(error?.message || '删除失败')
+    }
   }
 }
 
@@ -194,7 +196,7 @@ onMounted(() => {
     <!-- Page Header -->
     <div class="page-header">
       <h1 class="page-title">课程管理</h1>
-      <button class="btn-primary" @click="openAddDialog">+ 添加课程</button>
+      <button type="button" class="btn-primary" @click="openAddDialog">+ 添加课程</button>
     </div>
 
     <!-- Filter Bar -->
@@ -207,7 +209,7 @@ onMounted(() => {
         <option value="">全部类型</option>
         <option v-for="t in typeOptions" :key="t" :value="t">{{ t }}</option>
       </select>
-      <button v-if="filterSemester || filterType" class="btn-text" @click="resetFilter">
+      <button type="button" v-if="filterSemester || filterType" class="btn-text" @click="resetFilter">
         重置筛选
       </button>
     </div>
@@ -232,8 +234,8 @@ onMounted(() => {
           <span>{{ item.semester }}</span>
           <span class="course-grade">{{ item.score ?? '-' }}</span>
           <div class="course-actions">
-            <button class="action-btn" @click="openEditDialog(item)">编辑</button>
-            <button class="action-btn danger" @click="handleDelete(item)">删除</button>
+            <button type="button" class="action-btn" @click="openEditDialog(item)">编辑</button>
+            <button type="button" class="action-btn danger" @click="handleDelete(item)">删除</button>
           </div>
         </div>
       </div>
@@ -243,7 +245,7 @@ onMounted(() => {
     <div v-if="!loading && courseList.length === 0" class="empty-state">
       <div class="empty-state-icon">📚</div>
       <div class="empty-state-text">暂无课程数据</div>
-      <button class="btn-primary" @click="openAddDialog">添加第一门课程</button>
+      <button type="button" class="btn-primary" @click="openAddDialog">添加第一门课程</button>
     </div>
 
     <!-- Pagination -->
@@ -300,8 +302,8 @@ onMounted(() => {
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <button class="btn-secondary" @click="dialogVisible = false">取消</button>
-          <button class="btn-primary" @click="handleSubmit">确定</button>
+          <button type="button" class="btn-secondary" @click="dialogVisible = false">取消</button>
+          <button type="button" class="btn-primary" @click="handleSubmit">确定</button>
         </div>
       </template>
     </el-dialog>
@@ -325,7 +327,7 @@ onMounted(() => {
 }
 
 .page-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 2rem;
   font-weight: 400;
@@ -448,7 +450,7 @@ onMounted(() => {
 }
 
 .course-name {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 1.25rem;
   color: oklch(25% 0.02 30);
@@ -476,7 +478,7 @@ onMounted(() => {
 }
 
 .course-grade {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 1.5rem;
   color: oklch(58% 0.16 20);
@@ -554,7 +556,7 @@ onMounted(() => {
 }
 
 :deep(.el-dialog__title) {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 1.25rem;
   font-weight: 400;

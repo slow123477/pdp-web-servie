@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import request from '@/utils/request'
 
 const router = useRouter()
@@ -116,7 +117,7 @@ async function fetchData() {
       gpaData.value = { ...gpaData.value, ...gpaRes }
     }
   } catch (error) {
-    console.error(error)
+    ElMessage.error(error?.message || '获取成绩数据失败')
   } finally {
     loading.value = false
   }
@@ -367,7 +368,7 @@ onMounted(() => {
 }
 
 .page-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 2.5rem;
   font-weight: 400;
@@ -461,7 +462,7 @@ onMounted(() => {
 }
 
 .metric-value {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 2.5rem;
   color: oklch(25% 0.02 30);
@@ -537,7 +538,7 @@ onMounted(() => {
 }
 
 .section-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 1.25rem;
   font-weight: 400;
@@ -691,7 +692,7 @@ onMounted(() => {
 
 /* Side */
 .side-title {
-  font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Georgia', serif;
   font-size: 1.125rem;
   font-weight: 400;
